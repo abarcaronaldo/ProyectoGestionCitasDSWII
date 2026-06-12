@@ -28,11 +28,11 @@ class UsuarioRepositoryTest {
     @Autowired
     private RolRepository rolRepository;
 
-    private Rol rolVecino;
+    private Rol rolPaciente;
 
     @BeforeEach
     void setUp() {
-        rolVecino = rolRepository.save(new Rol("VECINO"));
+        rolPaciente = rolRepository.save(new Rol("PACIENTE"));
     }
 
     private Usuario nuevoUsuario(String email) {
@@ -42,7 +42,7 @@ class UsuarioRepositoryTest {
         u.setEmail(email);
         u.setPasswordHash("$2b$10$hashdeprueba");
         u.setTelefono("999000111");
-        u.setRol(rolVecino);
+        u.setRol(rolPaciente);
         u.setActivo(true);
         return u;
     }

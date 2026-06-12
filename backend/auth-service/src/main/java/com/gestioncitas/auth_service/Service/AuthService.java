@@ -1,7 +1,7 @@
 package com.gestioncitas.auth_service.Service;
 
 
-import com.cigestioncitastas.auth_service.Entity.Rol;
+import com.gestioncitas.auth_service.Entity.Rol;
 import com.gestioncitas.auth_service.Entity.Usuario;
 import com.gestioncitas.auth_service.Exception.ApiExceptions;
 import com.gestioncitas.auth_service.Repository.RolRepository;

@@ -19,7 +19,7 @@ public class Rol {
     private Long id;
 
     @Column(nullable = false, unique = true, length = 20)
-    private String nombre; // VECINO, RECICLADOR, ADMIN
+    private String nombre; // PACIENTE, MEDICO, RECEPCIONISTA, ADMIN
 
     public Rol(String nombre) {
         this.nombre = nombre;

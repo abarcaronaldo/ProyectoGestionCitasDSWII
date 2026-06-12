@@ -12,12 +12,11 @@ import org.springframework.stereotype.Component;
 
 /**
  * Carga datos iniciales (roles y usuarios de prueba) si la base está vacía.
- * Password de todos los usuarios demo: ReciclaPe2026
+ * Password de todos los usuarios demo: Gestion2026
  */
 @Component
 @Profile("!test")
 public class DataSeeder implements CommandLineRunner {
-
     private final RolRepository rolRepository;
     private final UserRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
@@ -32,16 +31,17 @@ public class DataSeeder implements CommandLineRunner {
     @Override
     public void run(String... args) {
         if (rolRepository.count() == 0) {
-            rolRepository.save(new Rol("VECINO"));
-            rolRepository.save(new Rol("RECICLADOR"));
+            rolRepository.save(new Rol("PACIENTE"));
+            rolRepository.save(new Rol("MEDICO"));
+            rolRepository.save(new Rol("RECEPCIONISTA"));
             rolRepository.save(new Rol("ADMIN"));
         }
         if (usuarioRepository.count() == 0) {
-            crear("Lucía", "Quispe Ramos", "lucia.vecino@reciclape.pe", "987654321", "VECINO");
-            crear("Carlos", "Huamán Soto", "carlos.vecino@reciclape.pe", "987111222", "VECINO");
-            crear("Marta", "Flores Díaz", "marta.recicla@reciclape.pe", "987333444", "RECICLADOR");
-            crear("Pedro", "Mamani Cruz", "pedro.recicla@reciclape.pe", "987555666", "RECICLADOR");
-            crear("Ana", "Torres Vega", "admin@reciclape.pe", "987777888", "ADMIN");
+            crear("Lucía", "Quispe Ramos", "paciente.Quispe@gestion.pe", "987654321", "PACIENTE");
+            crear("Carlos", "Huamán Soto", "paciente.Soto@gestion.pe", "987111222", "PACIENTE");
+            crear("Marta", "Flores Díaz", "medico.Flores@gestion.pe", "987333444", "MEDICO");
+            crear("Pedro", "Mamani Cruz", "medico.Mamani@gestion.pe", "987555666", "MEDICO");
+            crear("Ana", "Torres Vega", "admin@gestion.pe", "987777888", "ADMIN");
         }
     }
 
@@ -52,7 +52,7 @@ public class DataSeeder implements CommandLineRunner {
         u.setApellido(apellidos);
         u.setEmail(email);
         u.setTelefono(telefono);
-        u.setPasswordHash(passwordEncoder.encode("ReciclaPe2026"));
+        u.setPasswordHash(passwordEncoder.encode("Gestion2026"));
         u.setRol(rol);
         u.setActivo(true);
         usuarioRepository.save(u);

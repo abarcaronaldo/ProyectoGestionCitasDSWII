@@ -1,8 +1,8 @@
-package com.citas.auth_service.Controller;
+package com.gestioncitas.auth_service.Controller;
 
-import com.citas.auth_service.Service.UsuarioService;
-import com.citas.auth_service.dto.UsuarioActualizarDTO;
-import com.citas.auth_service.dto.UsuarioDTO;
+import com.gestioncitas.auth_service.Service.UsuarioService;
+import com.gestioncitas.auth_service.dto.UsuarioActualizarDTO;
+import com.gestioncitas.auth_service.dto.UsuarioDTO;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
