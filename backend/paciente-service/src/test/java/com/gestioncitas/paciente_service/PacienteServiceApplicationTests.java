@@ -1,10 +1,10 @@
-package com.citas.user_service;
+package com.gestioncitas.paciente_service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class UserServiceApplicationTests {
+class PacienteServiceApplicationTests {
 
 	@Test
 	void contextLoads() {
