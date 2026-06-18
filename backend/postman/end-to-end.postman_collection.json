@@ -1,0 +1,224 @@
+{
+  "info": {
+    "name": "EFSRT V - Flujo end-to-end por el gateway (issue 6.5)",
+    "description": "Coleccion Postman del flujo completo del sistema, esta vez TODO a traves del api-gateway (puerto 8080), con JWT real de auth-service. No se manda ninguna cabecera X-User-Id/X-User-Rol a mano: el gateway las agrega solo, leyendolas del JWT (issue 6.2). Incluye un caso de spoofing: mandar X-User-Rol a mano para confirmar que el gateway lo ignora.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "pacienteId", "value": "1" },
+    { "key": "medicoId", "value": "1" },
+    { "key": "especialidadId", "value": "1" },
+    { "key": "jwtPaciente", "value": "" },
+    { "key": "jwtMedico", "value": "" },
+    { "key": "jwtAdmin", "value": "" },
+    { "key": "citaId", "value": "" },
+    { "key": "atencionId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Login PACIENTE (Lucia) -> 200",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "pm.collectionVariables.set('jwtPaciente', pm.response.json().token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"paciente.Quispe@gestion.pe\",\n  \"password\": \"Gestion2026\"\n}" }
+      }
+    },
+    {
+      "name": "2. Login MEDICO (Marta) -> 200",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "pm.collectionVariables.set('jwtMedico', pm.response.json().token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"medico.Flores@gestion.pe\",\n  \"password\": \"Gestion2026\"\n}" }
+      }
+    },
+    {
+      "name": "3. Login ADMIN (Ana) -> 200",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "pm.collectionVariables.set('jwtAdmin', pm.response.json().token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@gestion.pe\",\n  \"password\": \"Gestion2026\"\n}" }
+      }
+    },
+    {
+      "name": "4. Reservar cita por el gateway (PACIENTE, sin X-User-* a mano) -> 201",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('201 Created', () => pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('citaId', pm.response.json().id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{jwtPaciente}}" }
+        ],
+        "url": "{{baseUrl}}/api/citas",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"pacienteId\": {{pacienteId}},\n  \"medicoId\": {{medicoId}},\n  \"especialidadId\": {{especialidadId}},\n  \"fechaHora\": \"2030-07-01T10:00:00\",\n  \"motivo\": \"Control end-to-end por gateway\"\n}"
+        }
+      }
+    },
+    {
+      "name": "5. Marcar asistencia por el gateway (MEDICO) -> 200 ATENDIDA",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "pm.test('estado ATENDIDA', () => pm.expect(pm.response.json().estado).to.eql('ATENDIDA'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{jwtMedico}}" }
+        ],
+        "url": "{{baseUrl}}/api/citas/{{citaId}}/asistencia",
+        "body": { "mode": "raw", "raw": "{\n  \"asistio\": true\n}" }
+      }
+    },
+    {
+      "name": "6. Registrar atencion por el gateway (MEDICO) -> 201",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('201 Created', () => pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('atencionId', pm.response.json().id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{jwtMedico}}" }
+        ],
+        "url": "{{baseUrl}}/api/atenciones",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"citaId\": {{citaId}},\n  \"motivoConsulta\": \"Control end-to-end\",\n  \"diagnostico\": \"Sano\",\n  \"tratamiento\": \"Ninguno\"\n}"
+        }
+      }
+    },
+    {
+      "name": "7. Ver mi propia atencion (PACIENTE) -> 200 (ver solo lo propio funciona via gateway)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "exec": ["pm.test('200 OK', () => pm.response.to.have.status(200));"] }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{jwtPaciente}}" }],
+        "url": "{{baseUrl}}/api/atenciones/{{atencionId}}"
+      }
+    },
+    {
+      "name": "8. Resumen de reportes (ADMIN) -> 200",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "pm.test('al menos 1 atendida', () => pm.expect(pm.response.json().totalAtendidas).to.be.at.least(1));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{jwtAdmin}}" }],
+        "url": "{{baseUrl}}/api/reportes/resumen"
+      }
+    },
+    {
+      "name": "9. ANTI-SPOOFING: PACIENTE manda X-User-Rol=ADMIN a mano -> 403 (el gateway lo ignora)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('403 Forbidden (el gateway no deja pasar el rol falso)', () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwtPaciente}}" },
+          { "key": "X-User-Rol", "value": "ADMIN" },
+          { "key": "X-User-Id", "value": "5" }
+        ],
+        "url": "{{baseUrl}}/api/reportes/resumen"
+      }
+    },
+    {
+      "name": "10. Resumen de reportes sin token -> 401",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "exec": ["pm.test('401 Unauthorized', () => pm.response.to.have.status(401));"] }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/reportes/resumen"
+      }
+    }
+  ]
+}
