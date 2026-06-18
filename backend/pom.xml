@@ -24,6 +24,7 @@
         <module>doctor-service</module>
         <module>citas-service</module>
         <module>historial-medico-service</module>
+        <module>reporte-service</module>
     </modules>
 
     <properties>
