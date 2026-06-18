@@ -39,4 +39,28 @@ public class GatewayConfig {
                 .build();
     }
 
+    @Bean
+    public RouterFunction<ServerResponse> citasServerResponseRoutes(){
+        return route("citas-service")
+                .route(path("/api/citas/**"), http())
+                .filter(lb("citas-service"))
+                .build();
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> historialServerResponseRoutes(){
+        return route("historial-medico-service")
+                .route(path("/api/atenciones/**"), http())
+                .filter(lb("historial-medico-service"))
+                .build();
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> reporteServerResponseRoutes(){
+        return route("reporte-service")
+                .route(path("/api/reportes/**"), http())
+                .filter(lb("reporte-service"))
+                .build();
+    }
+
 }
