@@ -22,6 +22,7 @@
         <module>auth-service</module>
         <module>paciente-service</module>
         <module>doctor-service</module>
+        <module>citas-service</module>
     </modules>
 
     <properties>
