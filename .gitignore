@@ -10,3 +10,7 @@ target/
 
 # OS
 .DS_Store
+
+# Archivos temporales de editores
+*.tmp
+*.tmp.*
