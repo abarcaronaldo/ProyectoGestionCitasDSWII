@@ -52,6 +52,13 @@ public class PacienteService {
                 .orElseThrow(() -> new ApiExceptions.RecursoNoEncontrado("Paciente no encontrado: " + id));
     }
 
+    @Transactional(readOnly = true)
+    public PacienteDTO obtenerPorUsuarioId(Long usuarioId) {
+        return pacienteRepository.findByUsuarioId(usuarioId)
+                .map(PacienteDTO::from)
+                .orElseThrow(() -> new ApiExceptions.RecursoNoEncontrado("No hay un paciente asociado al usuario: " + usuarioId));
+    }
+
     @Transactional
     public PacienteDTO actualizar(Long id, PacienteActualizarDTO dto) {
         Paciente paciente = pacienteRepository.findById(id)

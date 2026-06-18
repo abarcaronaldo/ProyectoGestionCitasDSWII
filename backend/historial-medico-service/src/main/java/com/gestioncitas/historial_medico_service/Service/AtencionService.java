@@ -1,6 +1,8 @@
 package com.gestioncitas.historial_medico_service.Service;
 
 import com.gestioncitas.historial_medico_service.Client.CitasClient;
+import com.gestioncitas.historial_medico_service.Client.DoctorClient;
+import com.gestioncitas.historial_medico_service.Client.PacienteClient;
 import com.gestioncitas.historial_medico_service.Entity.Atencion;
 import com.gestioncitas.historial_medico_service.Exception.ApiExceptions;
 import com.gestioncitas.historial_medico_service.Repository.AtencionRepository;
@@ -18,13 +20,20 @@ import java.util.List;
 public class AtencionService {
 
     private static final String ESTADO_ATENDIDA = "ATENDIDA";
+    private static final String ROL_PACIENTE = "PACIENTE";
+    private static final String ROL_MEDICO = "MEDICO";
 
     private final AtencionRepository atencionRepository;
     private final CitasClient citasClient;
+    private final PacienteClient pacienteClient;
+    private final DoctorClient doctorClient;
 
-    public AtencionService(AtencionRepository atencionRepository, CitasClient citasClient) {
+    public AtencionService(AtencionRepository atencionRepository, CitasClient citasClient,
+                            PacienteClient pacienteClient, DoctorClient doctorClient) {
         this.atencionRepository = atencionRepository;
         this.citasClient = citasClient;
+        this.pacienteClient = pacienteClient;
+        this.doctorClient = doctorClient;
     }
 
     @Transactional
@@ -87,6 +96,81 @@ public class AtencionService {
                 .orElseThrow(() -> new ApiExceptions.RecursoNoEncontrado("Atención no encontrada: " + id));
         atencion.setActivo(false);
         atencionRepository.save(atencion);
+    }
+
+    /** "Ver solo lo propio": un PACIENTE/MEDICO solo puede leer atenciones donde el sea el dueño real. */
+    @Transactional(readOnly = true)
+    public AtencionDTO obtenerVerificandoPropiedad(Long id, Long usuarioId, String rol) {
+        Atencion atencion = atencionRepository.findById(id)
+                .orElseThrow(() -> new ApiExceptions.RecursoNoEncontrado("Atención no encontrada: " + id));
+        verificarPropiedad(atencion, usuarioId, rol);
+        return AtencionDTO.from(atencion);
+    }
+
+    /** PACIENTE -> sus atenciones como paciente. MEDICO -> las que el atendio. */
+    @Transactional(readOnly = true)
+    public List<AtencionDTO> listarMisAtenciones(Long usuarioId, String rol) {
+        if (ROL_PACIENTE.equals(rol)) {
+            return listarPorPaciente(resolverPacienteId(usuarioId));
+        }
+        if (ROL_MEDICO.equals(rol)) {
+            return listarPorMedico(resolverMedicoId(usuarioId));
+        }
+        throw new ApiExceptions.ReglaNegocio("El rol '" + rol + "' no tiene atenciones propias que listar.");
+    }
+
+    /** Un PACIENTE solo puede listar su propio historial; ADMIN/RECEPCIONISTA pueden listar el de cualquiera. */
+    @Transactional(readOnly = true)
+    public List<AtencionDTO> listarPorPacienteVerificandoPropiedad(Long pacienteId, Long usuarioId, String rol) {
+        if (ROL_PACIENTE.equals(rol) && !resolverPacienteId(usuarioId).equals(pacienteId)) {
+            throw new ApiExceptions.AccesoDenegado("Solo puedes ver tu propio historial.");
+        }
+        return listarPorPaciente(pacienteId);
+    }
+
+    /** Un MEDICO solo puede listar su propia agenda clinica; ADMIN/RECEPCIONISTA pueden listar la de cualquiera. */
+    @Transactional(readOnly = true)
+    public List<AtencionDTO> listarPorMedicoVerificandoPropiedad(Long medicoId, Long usuarioId, String rol) {
+        if (ROL_MEDICO.equals(rol) && !resolverMedicoId(usuarioId).equals(medicoId)) {
+            throw new ApiExceptions.AccesoDenegado("Solo puedes ver tus propias atenciones como médico.");
+        }
+        return listarPorMedico(medicoId);
+    }
+
+    /** Solo el medico que atendio (o un admin) puede corregir el diagnostico/tratamiento registrado. */
+    @Transactional
+    public AtencionDTO actualizarVerificandoPropiedad(Long id, AtencionActualizarDTO dto, Long usuarioId, String rol) {
+        Atencion atencion = atencionRepository.findById(id)
+                .orElseThrow(() -> new ApiExceptions.RecursoNoEncontrado("Atención no encontrada: " + id));
+        if (ROL_MEDICO.equals(rol) && !resolverMedicoId(usuarioId).equals(atencion.getMedicoId())) {
+            throw new ApiExceptions.AccesoDenegado("Solo el médico que registró la atención puede editarla.");
+        }
+        return actualizar(id, dto);
+    }
+
+    private void verificarPropiedad(Atencion atencion, Long usuarioId, String rol) {
+        if (ROL_PACIENTE.equals(rol) && !resolverPacienteId(usuarioId).equals(atencion.getPacienteId())) {
+            throw new ApiExceptions.AccesoDenegado("Solo puedes ver tus propias atenciones.");
+        }
+        if (ROL_MEDICO.equals(rol) && !resolverMedicoId(usuarioId).equals(atencion.getMedicoId())) {
+            throw new ApiExceptions.AccesoDenegado("Solo puedes ver las atenciones que tú registraste.");
+        }
+    }
+
+    private Long resolverPacienteId(Long usuarioId) {
+        try {
+            return pacienteClient.obtenerPorUsuarioId(usuarioId).id();
+        } catch (FeignException.NotFound e) {
+            throw new ApiExceptions.RecursoNoEncontrado("No hay un paciente asociado al usuario: " + usuarioId);
+        }
+    }
+
+    private Long resolverMedicoId(Long usuarioId) {
+        try {
+            return doctorClient.obtenerPorUsuarioId(usuarioId).id();
+        } catch (FeignException.NotFound e) {
+            throw new ApiExceptions.RecursoNoEncontrado("No hay un médico asociado al usuario: " + usuarioId);
+        }
     }
 
     private CitaClienteDTO obtenerCitaAtendida(Long citaId) {

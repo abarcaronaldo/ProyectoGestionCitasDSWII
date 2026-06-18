@@ -41,6 +41,11 @@ public class MedicoController {
         return medicoService.listarPorEspecialidad(especialidadId);
     }
 
+    @GetMapping("/usuario/{usuarioId}")
+    public MedicoDTO obtenerPorUsuarioId(@PathVariable Long usuarioId) {
+        return medicoService.obtenerPorUsuarioId(usuarioId);
+    }
+
     @PutMapping("/{id}")
     public MedicoDTO actualizar(@PathVariable Long id, @Valid @RequestBody MedicoActualizarDTO dto) {
         return medicoService.actualizar(id, dto);

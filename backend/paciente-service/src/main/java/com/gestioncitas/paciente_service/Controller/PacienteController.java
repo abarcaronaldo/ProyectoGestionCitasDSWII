@@ -36,6 +36,11 @@ public class PacienteController {
         return pacienteService.obtener(id);
     }
 
+    @GetMapping("/usuario/{usuarioId}")
+    public PacienteDTO obtenerPorUsuarioId(@PathVariable Long usuarioId) {
+        return pacienteService.obtenerPorUsuarioId(usuarioId);
+    }
+
     @PutMapping("/{id}")
     public PacienteDTO actualizar(@PathVariable Long id, @Valid @RequestBody PacienteActualizarDTO dto) {
         return pacienteService.actualizar(id, dto);

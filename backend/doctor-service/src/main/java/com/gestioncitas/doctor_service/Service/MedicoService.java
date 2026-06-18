@@ -58,6 +58,13 @@ public class MedicoService {
         return medicoRepository.findByEspecialidadId(especialidadId).stream().map(MedicoDTO::from).toList();
     }
 
+    @Transactional(readOnly = true)
+    public MedicoDTO obtenerPorUsuarioId(Long usuarioId) {
+        return medicoRepository.findByUsuarioId(usuarioId)
+                .map(MedicoDTO::from)
+                .orElseThrow(() -> new ApiExceptions.RecursoNoEncontrado("No hay un médico asociado al usuario: " + usuarioId));
+    }
+
     @Transactional
     public MedicoDTO actualizar(Long id, MedicoActualizarDTO dto) {
         Medico medico = medicoRepository.findById(id)
