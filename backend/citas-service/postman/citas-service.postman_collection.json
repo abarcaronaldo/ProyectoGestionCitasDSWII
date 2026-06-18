@@ -1,0 +1,245 @@
+{
+  "info": {
+    "name": "citas-service - Flujo de citas (issue 3.11)",
+    "description": "Coleccion Postman del flujo completo de citas-service: reservar, consultar, reprogramar, marcar asistencia y cancelar, mas los casos de error principales (400/403/404/409). Apunta directo al microservicio (puerto 8084) porque la ruta del gateway para citas-service todavia no existe (queda para la issue 6.1). Las cabeceras X-User-Id/X-User-Rol se envian a mano simulando lo que el gateway propagara cuando se resuelva la issue 6.2.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8084" },
+    { "key": "pacienteId", "value": "1" },
+    { "key": "medicoId", "value": "1" },
+    { "key": "especialidadId", "value": "1" },
+    { "key": "citaId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Reservar cita (PACIENTE) -> 201",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('201 Created', () => pm.response.to.have.status(201));",
+              "const body = pm.response.json();",
+              "pm.collectionVariables.set('citaId', body.id);",
+              "pm.test('estado RESERVADA', () => pm.expect(body.estado).to.eql('RESERVADA'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-User-Id", "value": "1" },
+          { "key": "X-User-Rol", "value": "PACIENTE" }
+        ],
+        "url": "{{baseUrl}}/api/citas",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"pacienteId\": {{pacienteId}},\n  \"medicoId\": {{medicoId}},\n  \"especialidadId\": {{especialidadId}},\n  \"fechaHora\": \"2030-03-01T10:00:00\",\n  \"motivo\": \"Control postman\"\n}"
+        }
+      }
+    },
+    {
+      "name": "2. Obtener cita por id -> 200",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "exec": ["pm.test('200 OK', () => pm.response.to.have.status(200));"] }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "X-User-Id", "value": "1" },
+          { "key": "X-User-Rol", "value": "PACIENTE" }
+        ],
+        "url": "{{baseUrl}}/api/citas/{{citaId}}"
+      }
+    },
+    {
+      "name": "3. Listar citas por paciente -> 200",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "exec": ["pm.test('200 OK', () => pm.response.to.have.status(200));"] }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "X-User-Id", "value": "1" },
+          { "key": "X-User-Rol", "value": "PACIENTE" }
+        ],
+        "url": "{{baseUrl}}/api/citas/paciente/{{pacienteId}}"
+      }
+    },
+    {
+      "name": "4. Listar citas por medico -> 200",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "exec": ["pm.test('200 OK', () => pm.response.to.have.status(200));"] }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "X-User-Id", "value": "5" },
+          { "key": "X-User-Rol", "value": "MEDICO" }
+        ],
+        "url": "{{baseUrl}}/api/citas/medico/{{medicoId}}"
+      }
+    },
+    {
+      "name": "5. Reprogramar cita (RECEPCIONISTA) -> 200",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "pm.test('fechaHora actualizada', () => pm.expect(pm.response.json().fechaHora).to.eql('2030-03-01T11:00:00'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-User-Id", "value": "7" },
+          { "key": "X-User-Rol", "value": "RECEPCIONISTA" }
+        ],
+        "url": "{{baseUrl}}/api/citas/{{citaId}}/reprogramar",
+        "body": { "mode": "raw", "raw": "{\n  \"fechaHora\": \"2030-03-01T11:00:00\"\n}" }
+      }
+    },
+    {
+      "name": "6. Marcar asistencia (MEDICO) -> 200 ATENDIDA",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "pm.test('estado ATENDIDA', () => pm.expect(pm.response.json().estado).to.eql('ATENDIDA'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-User-Id", "value": "5" },
+          { "key": "X-User-Rol", "value": "MEDICO" }
+        ],
+        "url": "{{baseUrl}}/api/citas/{{citaId}}/asistencia",
+        "body": { "mode": "raw", "raw": "{\n  \"asistio\": true\n}" }
+      }
+    },
+    {
+      "name": "7. Cancelar cita ya ATENDIDA (ADMIN) -> 409 regla de negocio",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "exec": ["pm.test('409 Conflict', () => pm.response.to.have.status(409));"] }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "X-User-Id", "value": "9" },
+          { "key": "X-User-Rol", "value": "ADMIN" }
+        ],
+        "url": "{{baseUrl}}/api/citas/{{citaId}}/cancelar"
+      }
+    },
+    {
+      "name": "8. Reservar sin cabeceras -> 403",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "exec": ["pm.test('403 Forbidden', () => pm.response.to.have.status(403));"] }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/citas",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"pacienteId\": {{pacienteId}},\n  \"medicoId\": {{medicoId}},\n  \"especialidadId\": {{especialidadId}},\n  \"fechaHora\": \"2030-03-02T10:00:00\"\n}"
+        }
+      }
+    },
+    {
+      "name": "9. Reservar con rol MEDICO (no autorizado) -> 403",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "exec": ["pm.test('403 Forbidden', () => pm.response.to.have.status(403));"] }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-User-Id", "value": "5" },
+          { "key": "X-User-Rol", "value": "MEDICO" }
+        ],
+        "url": "{{baseUrl}}/api/citas",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"pacienteId\": {{pacienteId}},\n  \"medicoId\": {{medicoId}},\n  \"especialidadId\": {{especialidadId}},\n  \"fechaHora\": \"2030-03-02T10:00:00\"\n}"
+        }
+      }
+    },
+    {
+      "name": "10. Reservar con fecha pasada -> 400",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "exec": ["pm.test('400 Bad Request', () => pm.response.to.have.status(400));"] }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-User-Id", "value": "1" },
+          { "key": "X-User-Rol", "value": "PACIENTE" }
+        ],
+        "url": "{{baseUrl}}/api/citas",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"pacienteId\": {{pacienteId}},\n  \"medicoId\": {{medicoId}},\n  \"especialidadId\": {{especialidadId}},\n  \"fechaHora\": \"2020-01-01T10:00:00\"\n}"
+        }
+      }
+    },
+    {
+      "name": "11. Reservar con medico inexistente -> 404",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "exec": ["pm.test('404 Not Found', () => pm.response.to.have.status(404));"] }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-User-Id", "value": "1" },
+          { "key": "X-User-Rol", "value": "PACIENTE" }
+        ],
+        "url": "{{baseUrl}}/api/citas",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"pacienteId\": {{pacienteId}},\n  \"medicoId\": 9999,\n  \"especialidadId\": {{especialidadId}},\n  \"fechaHora\": \"2030-03-02T10:00:00\"\n}"
+        }
+      }
+    }
+  ]
+}
