@@ -30,4 +30,13 @@ public class GatewayConfig {
                 .build();
     }
 
+    @Bean
+    public RouterFunction<ServerResponse> doctorServerResponseRoutes(){
+        return route("doctor-service")
+                .route(path("/api/medicos/**"), http())
+                .route(path("/api/especialidades/**"), http())
+                .filter(lb("doctor-service"))
+                .build();
+    }
+
 }
