@@ -28,7 +28,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/medicos/**", "/api/especialidades/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/medicos/**", "/api/especialidades/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/medicos/**", "/api/especialidades/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/medicos/**", "/api/especialidades/**").hasAnyRole("ADMIN", "RECEPCIONISTA", "MEDICO")
+                        // listar TODOS los medicos/especialidades: solo personal de la clinica.
+                        // Leer UNO por id (o por especialidad) cae en anyRequest().authenticated():
+                        // un PACIENTE necesita poder leer el medico de su propia cita (vía Feign desde citas-service).
+                        .requestMatchers(HttpMethod.GET, "/api/medicos", "/api/especialidades").hasAnyRole("ADMIN", "RECEPCIONISTA", "MEDICO")
                         .anyRequest().authenticated())
                 .addFilterBefore(headerAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
