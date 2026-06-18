@@ -19,6 +19,8 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class CitaService {
 
@@ -95,6 +97,23 @@ public class CitaService {
             eventPublisher.publicar(CitaEventPublisher.ROUTING_ATENDIDA, CitaEventoDTO.from(citaDTO));
         }
         return citaDTO;
+    }
+
+    @Transactional(readOnly = true)
+    public CitaDTO obtener(Long id) {
+        return citaRepository.findById(id)
+                .map(CitaDTO::from)
+                .orElseThrow(() -> new ApiExceptions.RecursoNoEncontrado("Cita no encontrada: " + id));
+    }
+
+    @Transactional(readOnly = true)
+    public List<CitaDTO> listarPorPaciente(Long pacienteId) {
+        return citaRepository.findByPacienteId(pacienteId).stream().map(CitaDTO::from).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<CitaDTO> listarPorMedico(Long medicoId) {
+        return citaRepository.findByMedicoId(medicoId).stream().map(CitaDTO::from).toList();
     }
 
     private Cita obtenerCitaReservada(Long id) {
