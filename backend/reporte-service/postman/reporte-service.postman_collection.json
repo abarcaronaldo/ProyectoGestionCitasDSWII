@@ -1,0 +1,227 @@
+{
+  "info": {
+    "name": "reporte-service - Reportes y metricas (issue 5.6)",
+    "description": "Coleccion Postman del flujo completo de reporte-service: genera eventos reales en citas-service (reservar+atender, reservar+cancelar), espera a que el consumidor RabbitMQ los procese, y verifica los reportes agregados, mas los casos de error principales (403/404). Apunta directo a los microservicios (8084 y 8086) porque sus rutas de gateway todavia no existen (quedan para la issue 6.1). Ejecutar con 'newman run ... --delay-request 1500' para darle tiempo al consumidor a procesar cada evento antes de pedir los reportes.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrlCitas", "value": "http://localhost:8084" },
+    { "key": "baseUrlReporte", "value": "http://localhost:8086" },
+    { "key": "pacienteId", "value": "1" },
+    { "key": "medicoId", "value": "1" },
+    { "key": "especialidadId", "value": "1" },
+    { "key": "citaIdAtendida", "value": "" },
+    { "key": "citaIdCancelada", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. [citas] Reservar cita que se va a ATENDER -> 201",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('201 Created', () => pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('citaIdAtendida', pm.response.json().id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-User-Id", "value": "1" },
+          { "key": "X-User-Rol", "value": "PACIENTE" }
+        ],
+        "url": "{{baseUrlCitas}}/api/citas",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"pacienteId\": {{pacienteId}},\n  \"medicoId\": {{medicoId}},\n  \"especialidadId\": {{especialidadId}},\n  \"fechaHora\": \"2030-06-01T10:00:00\",\n  \"motivo\": \"Control postman reportes - atendida\"\n}"
+        }
+      }
+    },
+    {
+      "name": "2. [citas] Reservar cita que se va a CANCELAR -> 201",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('201 Created', () => pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('citaIdCancelada', pm.response.json().id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-User-Id", "value": "1" },
+          { "key": "X-User-Rol", "value": "PACIENTE" }
+        ],
+        "url": "{{baseUrlCitas}}/api/citas",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"pacienteId\": {{pacienteId}},\n  \"medicoId\": {{medicoId}},\n  \"especialidadId\": {{especialidadId}},\n  \"fechaHora\": \"2030-06-02T10:00:00\",\n  \"motivo\": \"Control postman reportes - cancelada\"\n}"
+        }
+      }
+    },
+    {
+      "name": "3. [citas] Marcar asistencia (MEDICO) -> 200 ATENDIDA (publica cita.atendida)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "exec": ["pm.test('200 OK', () => pm.response.to.have.status(200));"] }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-User-Id", "value": "5" },
+          { "key": "X-User-Rol", "value": "MEDICO" }
+        ],
+        "url": "{{baseUrlCitas}}/api/citas/{{citaIdAtendida}}/asistencia",
+        "body": { "mode": "raw", "raw": "{\n  \"asistio\": true\n}" }
+      }
+    },
+    {
+      "name": "4. [citas] Cancelar cita (ADMIN) -> 200 CANCELADA (publica cita.cancelada)",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "exec": ["pm.test('200 OK', () => pm.response.to.have.status(200));"] }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "X-User-Id", "value": "9" },
+          { "key": "X-User-Rol", "value": "ADMIN" }
+        ],
+        "url": "{{baseUrlCitas}}/api/citas/{{citaIdCancelada}}/cancelar"
+      }
+    },
+    {
+      "name": "5. [reporte] Resumen general (ADMIN) -> 200, incluye lo recien generado",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test('al menos 1 atendida', () => pm.expect(body.totalAtendidas).to.be.at.least(1));",
+              "pm.test('al menos 1 cancelada', () => pm.expect(body.totalCanceladas).to.be.at.least(1));",
+              "pm.test('total = suma de los 4 estados', () => pm.expect(body.total).to.eql(body.totalReservadas + body.totalAtendidas + body.totalCanceladas + body.totalNoAsistio));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "X-User-Id", "value": "9" },
+          { "key": "X-User-Rol", "value": "ADMIN" }
+        ],
+        "url": "{{baseUrlReporte}}/api/reportes/resumen"
+      }
+    },
+    {
+      "name": "6. [reporte] Resumen por medico (RECEPCIONISTA) -> 200, con nombre resuelto por Feign",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test('trae el nombre del medico', () => pm.expect(body.medicoNombre).to.be.a('string').and.not.empty);",
+              "pm.test('al menos 1 atendida de este medico', () => pm.expect(body.totalAtendidas).to.be.at.least(1));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "X-User-Id", "value": "7" },
+          { "key": "X-User-Rol", "value": "RECEPCIONISTA" }
+        ],
+        "url": "{{baseUrlReporte}}/api/reportes/medico/{{medicoId}}"
+      }
+    },
+    {
+      "name": "7. [reporte] Resumen por especialidad (MEDICO) -> 200",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "pm.test('trae el nombre de la especialidad', () => pm.expect(pm.response.json().especialidadNombre).to.be.a('string').and.not.empty);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "X-User-Id", "value": "5" },
+          { "key": "X-User-Rol", "value": "MEDICO" }
+        ],
+        "url": "{{baseUrlReporte}}/api/reportes/especialidad/{{especialidadId}}"
+      }
+    },
+    {
+      "name": "8. [reporte] Resumen de medico inexistente -> 404",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "exec": ["pm.test('404 Not Found', () => pm.response.to.have.status(404));"] }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "X-User-Id", "value": "9" },
+          { "key": "X-User-Rol", "value": "ADMIN" }
+        ],
+        "url": "{{baseUrlReporte}}/api/reportes/medico/999999"
+      }
+    },
+    {
+      "name": "9. [reporte] Resumen general con rol PACIENTE (no autorizado) -> 403",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "exec": ["pm.test('403 Forbidden', () => pm.response.to.have.status(403));"] }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "X-User-Id", "value": "1" },
+          { "key": "X-User-Rol", "value": "PACIENTE" }
+        ],
+        "url": "{{baseUrlReporte}}/api/reportes/resumen"
+      }
+    },
+    {
+      "name": "10. [reporte] Resumen general sin cabeceras -> 403",
+      "event": [
+        {
+          "listen": "test",
+          "script": { "exec": ["pm.test('403 Forbidden', () => pm.response.to.have.status(403));"] }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrlReporte}}/api/reportes/resumen"
+      }
+    }
+  ]
+}
