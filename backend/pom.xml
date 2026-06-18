@@ -23,6 +23,7 @@
         <module>paciente-service</module>
         <module>doctor-service</module>
         <module>citas-service</module>
+        <module>historial-medico-service</module>
     </modules>
 
     <properties>
