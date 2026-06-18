@@ -4,9 +4,11 @@ import com.gestioncitas.citas_service.Client.DoctorClient;
 import com.gestioncitas.citas_service.Client.PacienteClient;
 import com.gestioncitas.citas_service.Entity.Cita;
 import com.gestioncitas.citas_service.Entity.EstadoCita;
+import com.gestioncitas.citas_service.Event.CitaEventPublisher;
 import com.gestioncitas.citas_service.Exception.ApiExceptions;
 import com.gestioncitas.citas_service.Repository.CitaRepository;
 import com.gestioncitas.citas_service.dto.CitaDTO;
+import com.gestioncitas.citas_service.dto.CitaEventoDTO;
 import com.gestioncitas.citas_service.dto.MedicoClienteDTO;
 import com.gestioncitas.citas_service.dto.PacienteClienteDTO;
 import com.gestioncitas.citas_service.dto.ReprogramarCitaDTO;
@@ -26,11 +28,14 @@ public class CitaService {
     private final CitaRepository citaRepository;
     private final DoctorClient doctorClient;
     private final PacienteClient pacienteClient;
+    private final CitaEventPublisher eventPublisher;
 
-    public CitaService(CitaRepository citaRepository, DoctorClient doctorClient, PacienteClient pacienteClient) {
+    public CitaService(CitaRepository citaRepository, DoctorClient doctorClient, PacienteClient pacienteClient,
+                        CitaEventPublisher eventPublisher) {
         this.citaRepository = citaRepository;
         this.doctorClient = doctorClient;
         this.pacienteClient = pacienteClient;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -49,21 +54,26 @@ public class CitaService {
         cita.setFechaHora(dto.fechaHora());
         cita.setMotivo(dto.motivo());
 
+        CitaDTO citaDTO;
         try {
-            return CitaDTO.from(citaRepository.save(cita));
+            citaDTO = CitaDTO.from(citaRepository.save(cita));
         } catch (DataIntegrityViolationException e) {
             // El existsBy de arriba no es atomico: dos peticiones concurrentes pueden pasarlo a la vez.
             // La restriccion UNIQUE de la BD (3.3) es la que realmente garantiza que solo una se guarde;
             // si la perdimos en esa carrera, la traducimos al mismo error de negocio claro.
             throw new ApiExceptions.ReglaNegocio(HORARIO_OCUPADO);
         }
+        eventPublisher.publicar(CitaEventPublisher.ROUTING_RESERVADA, CitaEventoDTO.from(citaDTO));
+        return citaDTO;
     }
 
     @Transactional
     public CitaDTO cancelar(Long id) {
         Cita cita = obtenerCitaReservada(id);
         cita.setEstado(EstadoCita.CANCELADA);
-        return guardarConControlDeConcurrencia(cita);
+        CitaDTO citaDTO = guardarConControlDeConcurrencia(cita);
+        eventPublisher.publicar(CitaEventPublisher.ROUTING_CANCELADA, CitaEventoDTO.from(citaDTO));
+        return citaDTO;
     }
 
     @Transactional
@@ -80,7 +90,11 @@ public class CitaService {
     public CitaDTO marcarAsistencia(Long id, boolean asistio) {
         Cita cita = obtenerCitaReservada(id);
         cita.setEstado(asistio ? EstadoCita.ATENDIDA : EstadoCita.NO_ASISTIO);
-        return guardarConControlDeConcurrencia(cita);
+        CitaDTO citaDTO = guardarConControlDeConcurrencia(cita);
+        if (asistio) {
+            eventPublisher.publicar(CitaEventPublisher.ROUTING_ATENDIDA, CitaEventoDTO.from(citaDTO));
+        }
+        return citaDTO;
     }
 
     private Cita obtenerCitaReservada(Long id) {
