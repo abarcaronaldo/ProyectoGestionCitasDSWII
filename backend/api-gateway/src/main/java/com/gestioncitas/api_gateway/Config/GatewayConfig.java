@@ -22,4 +22,12 @@ public class GatewayConfig {
                 .build();
     }
 
+    @Bean
+    public RouterFunction<ServerResponse> pacienteServerResponseRoutes(){
+        return route("paciente-service")
+                .route(path("/api/pacientes/**"), http())
+                .filter(lb("paciente-service"))
+                .build();
+    }
+
 }
