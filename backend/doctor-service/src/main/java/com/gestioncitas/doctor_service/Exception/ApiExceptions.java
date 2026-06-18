@@ -1,0 +1,20 @@
+package com.gestioncitas.doctor_service.Exception;
+
+/** Excepciones de negocio del servicio de doctores. */
+public final class ApiExceptions {
+
+    private ApiExceptions() {
+    }
+
+    public static class RecursoNoEncontrado extends RuntimeException {
+        public RecursoNoEncontrado(String mensaje) {
+            super(mensaje);
+        }
+    }
+
+    public static class ReglaNegocio extends RuntimeException {
+        public ReglaNegocio(String mensaje) {
+            super(mensaje);
+        }
+    }
+}
