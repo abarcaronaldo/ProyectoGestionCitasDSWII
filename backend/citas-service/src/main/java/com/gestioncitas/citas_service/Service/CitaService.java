@@ -1,0 +1,127 @@
+package com.gestioncitas.citas_service.Service;
+
+import com.gestioncitas.citas_service.Client.DoctorClient;
+import com.gestioncitas.citas_service.Client.PacienteClient;
+import com.gestioncitas.citas_service.Entity.Cita;
+import com.gestioncitas.citas_service.Entity.EstadoCita;
+import com.gestioncitas.citas_service.Exception.ApiExceptions;
+import com.gestioncitas.citas_service.Repository.CitaRepository;
+import com.gestioncitas.citas_service.dto.CitaDTO;
+import com.gestioncitas.citas_service.dto.MedicoClienteDTO;
+import com.gestioncitas.citas_service.dto.PacienteClienteDTO;
+import com.gestioncitas.citas_service.dto.ReprogramarCitaDTO;
+import com.gestioncitas.citas_service.dto.ReservaCitaDTO;
+import feign.FeignException;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+public class CitaService {
+
+    private static final String HORARIO_OCUPADO = "El médico ya tiene una cita reservada en esa fecha y hora.";
+    private static final String CONFLICTO_CONCURRENCIA = "La cita fue modificada por otro proceso. Vuelve a intentarlo.";
+
+    private final CitaRepository citaRepository;
+    private final DoctorClient doctorClient;
+    private final PacienteClient pacienteClient;
+
+    public CitaService(CitaRepository citaRepository, DoctorClient doctorClient, PacienteClient pacienteClient) {
+        this.citaRepository = citaRepository;
+        this.doctorClient = doctorClient;
+        this.pacienteClient = pacienteClient;
+    }
+
+    @Transactional
+    public CitaDTO reservar(ReservaCitaDTO dto) {
+        validarMedicoActivo(dto.medicoId());
+        validarPacienteActivo(dto.pacienteId());
+
+        if (citaRepository.existsByMedicoIdAndFechaHora(dto.medicoId(), dto.fechaHora())) {
+            throw new ApiExceptions.ReglaNegocio(HORARIO_OCUPADO);
+        }
+
+        Cita cita = new Cita();
+        cita.setPacienteId(dto.pacienteId());
+        cita.setMedicoId(dto.medicoId());
+        cita.setEspecialidadId(dto.especialidadId());
+        cita.setFechaHora(dto.fechaHora());
+        cita.setMotivo(dto.motivo());
+
+        try {
+            return CitaDTO.from(citaRepository.save(cita));
+        } catch (DataIntegrityViolationException e) {
+            // El existsBy de arriba no es atomico: dos peticiones concurrentes pueden pasarlo a la vez.
+            // La restriccion UNIQUE de la BD (3.3) es la que realmente garantiza que solo una se guarde;
+            // si la perdimos en esa carrera, la traducimos al mismo error de negocio claro.
+            throw new ApiExceptions.ReglaNegocio(HORARIO_OCUPADO);
+        }
+    }
+
+    @Transactional
+    public CitaDTO cancelar(Long id) {
+        Cita cita = obtenerCitaReservada(id);
+        cita.setEstado(EstadoCita.CANCELADA);
+        return guardarConControlDeConcurrencia(cita);
+    }
+
+    @Transactional
+    public CitaDTO reprogramar(Long id, ReprogramarCitaDTO dto) {
+        Cita cita = obtenerCitaReservada(id);
+        if (citaRepository.existsByMedicoIdAndFechaHora(cita.getMedicoId(), dto.fechaHora())) {
+            throw new ApiExceptions.ReglaNegocio(HORARIO_OCUPADO);
+        }
+        cita.setFechaHora(dto.fechaHora());
+        return guardarConControlDeConcurrencia(cita);
+    }
+
+    @Transactional
+    public CitaDTO marcarAsistencia(Long id, boolean asistio) {
+        Cita cita = obtenerCitaReservada(id);
+        cita.setEstado(asistio ? EstadoCita.ATENDIDA : EstadoCita.NO_ASISTIO);
+        return guardarConControlDeConcurrencia(cita);
+    }
+
+    private Cita obtenerCitaReservada(Long id) {
+        Cita cita = citaRepository.findById(id)
+                .orElseThrow(() -> new ApiExceptions.RecursoNoEncontrado("Cita no encontrada: " + id));
+        if (cita.getEstado() != EstadoCita.RESERVADA) {
+            throw new ApiExceptions.ReglaNegocio(
+                    "La cita no esta en estado RESERVADA (estado actual: " + cita.getEstado() + ").");
+        }
+        return cita;
+    }
+
+    private CitaDTO guardarConControlDeConcurrencia(Cita cita) {
+        try {
+            return CitaDTO.from(citaRepository.save(cita));
+        } catch (ObjectOptimisticLockingFailureException | DataIntegrityViolationException e) {
+            throw new ApiExceptions.ReglaNegocio(CONFLICTO_CONCURRENCIA);
+        }
+    }
+
+    private void validarMedicoActivo(Long medicoId) {
+        MedicoClienteDTO medico;
+        try {
+            medico = doctorClient.obtenerMedico(medicoId);
+        } catch (FeignException.NotFound e) {
+            throw new ApiExceptions.RecursoNoEncontrado("Médico no encontrado: " + medicoId);
+        }
+        if (!medico.activo()) {
+            throw new ApiExceptions.ReglaNegocio("El médico no esta activo: " + medicoId);
+        }
+    }
+
+    private void validarPacienteActivo(Long pacienteId) {
+        PacienteClienteDTO paciente;
+        try {
+            paciente = pacienteClient.obtenerPaciente(pacienteId);
+        } catch (FeignException.NotFound e) {
+            throw new ApiExceptions.RecursoNoEncontrado("Paciente no encontrado: " + pacienteId);
+        }
+        if (!paciente.activo()) {
+            throw new ApiExceptions.ReglaNegocio("El paciente no esta activo: " + pacienteId);
+        }
+    }
+}
