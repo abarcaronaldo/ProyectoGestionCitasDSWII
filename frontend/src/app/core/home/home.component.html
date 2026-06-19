@@ -18,6 +18,13 @@
       <a routerLink="/medico/mi-agenda">Mi agenda</a>
     </p>
   }
+
+  @if (auth.getRol() === 'ADMIN' || auth.getRol() === 'RECEPCIONISTA') {
+    <p>
+      <a routerLink="/admin/medicos">Médicos</a> ·
+      <a routerLink="/admin/especialidades">Especialidades</a>
+    </p>
+  }
 } @else {
   <p><a routerLink="/login">Iniciar sesión</a> · <a routerLink="/registro">Registrarme</a></p>
 }

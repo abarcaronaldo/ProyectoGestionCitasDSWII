@@ -19,3 +19,18 @@ export interface MedicoDTO {
   activo: boolean;
   creadoEn: string;
 }
+
+export interface EspecialidadCrearRequest {
+  nombre: string;
+  descripcion?: string;
+}
+
+export interface MedicoCrearRequest {
+  usuarioId?: number;
+  nombres: string;
+  apellidos: string;
+  cmp: string;
+  telefono?: string;
+  email?: string;
+  especialidadId: number;
+}
