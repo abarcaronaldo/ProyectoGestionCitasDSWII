@@ -54,7 +54,7 @@ public class PacienteService {
 
     @Transactional(readOnly = true)
     public PacienteDTO obtenerPorUsuarioId(Long usuarioId) {
-        return pacienteRepository.findByUsuarioId(usuarioId)
+        return pacienteRepository.findByUsuarioIdAndActivoTrue(usuarioId)
                 .map(PacienteDTO::from)
                 .orElseThrow(() -> new ApiExceptions.RecursoNoEncontrado("No hay un paciente asociado al usuario: " + usuarioId));
     }

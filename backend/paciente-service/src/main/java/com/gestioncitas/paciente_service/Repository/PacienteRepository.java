@@ -11,5 +11,8 @@ public interface PacienteRepository extends JpaRepository<Paciente, Long> {
 
     Optional<Paciente> findByDni(String dni);
 
-    Optional<Paciente> findByUsuarioId(Long usuarioId);
+    // Solo el paciente ACTIVO: el borrado es lógico (activo=false), y un paciente dado de
+    // baja no debe resolver como "el paciente del usuario X". Filtrar por activo además evita
+    // el NonUniqueResultException si quedan filas inactivas con el mismo usuarioId.
+    Optional<Paciente> findByUsuarioIdAndActivoTrue(Long usuarioId);
 }

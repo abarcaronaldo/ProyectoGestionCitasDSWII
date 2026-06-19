@@ -387,7 +387,7 @@
           ]
         },
         {
-          "name": "Obtener paciente por usuarioId (propio, PACIENTE) -> 403 (BUG CONOCIDO, deberia ser 200)",
+          "name": "Obtener paciente por usuarioId (propio, PACIENTE) -> 200",
           "request": {
             "method": "GET",
             "header": [
@@ -403,7 +403,11 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('403 Forbidden (bug conocido, ver descripcion del request)', () => pm.response.to.have.status(403));"
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "// Fijar pacienteId al paciente del propio jwtPaciente (Lucia): asi la cita de la",
+                  "// carpeta '4. Citas' se reserva para ELLA y luego 'ver lo propio' sobre su atencion",
+                  "// funciona (si se usara otro paciente, el control de propiedad daria 403 legitimo).",
+                  "pm.collectionVariables.set('pacienteId', pm.response.json().id);"
                 ],
                 "type": "text/javascript"
               }
@@ -940,10 +944,14 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "const base = Date.now() % 100000000;",
-                  "const dt = new Date(2031, 0, 1 + (base % 300), 8 + (base % 10), 0, 0);",
+                  "// Fecha unica de verdad: base 2031-01-01 + un offset en segundos derivado del epoch",
+                  "// actual (resolucion de 1s sobre un rango de ~300 dias). Dos corridas separadas por",
+                  "// >=1s no colisionan -> evita el 409 por el constraint unico (medicoId, fechaHora).",
+                  "const base = new Date(2031, 0, 1, 0, 0, 0).getTime();",
+                  "const offsetSec = Math.floor(Date.now() / 1000) % (300 * 24 * 3600);",
+                  "const dt = new Date(base + offsetSec * 1000);",
                   "pm.collectionVariables.set('fechaCitaUnica', dt.toISOString().slice(0, 19));",
-                  "const dt2 = new Date(dt.getTime() + 24 * 60 * 60 * 1000);",
+                  "const dt2 = new Date(dt.getTime() + 7 * 24 * 60 * 60 * 1000);",
                   "pm.collectionVariables.set('fechaReprogramadaUnica', dt2.toISOString().slice(0, 19));"
                 ],
                 "type": "text/javascript"
@@ -1216,7 +1224,7 @@
           ]
         },
         {
-          "name": "Mis atenciones (PACIENTE, ver solo lo propio) -> 503 (BUG CONOCIDO, deberia ser 200)",
+          "name": "Mis atenciones (PACIENTE, ver solo lo propio) -> 200",
           "request": {
             "method": "GET",
             "header": [
@@ -1232,7 +1240,7 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('503 Service Unavailable (bug conocido, ver descripcion)', () => pm.response.to.have.status(503));"
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
                 ],
                 "type": "text/javascript"
               }
@@ -1240,7 +1248,7 @@
           ]
         },
         {
-          "name": "Obtener atencion por id (propietario) -> 503 (BUG CONOCIDO, deberia ser 200)",
+          "name": "Obtener atencion por id (propietario) -> 200",
           "request": {
             "method": "GET",
             "header": [
@@ -1256,7 +1264,7 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('503 Service Unavailable (bug conocido, ver descripcion)', () => pm.response.to.have.status(503));"
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
                 ],
                 "type": "text/javascript"
               }

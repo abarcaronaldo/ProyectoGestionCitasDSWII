@@ -155,21 +155,20 @@ paciente_items = [
         tests=["pm.test('200 OK', () => pm.response.to.have.status(200));"]
     ),
     req(
-        # BUG CONOCIDO (encontrado en la 8.4, no introducido por esta coleccion): este
-        # endpoint devuelve 403 SIEMPRE en paciente-service, sin importar el rol -- incluso
-        # ADMIN autenticado correctamente recibe el mismo 403 que un request anonimo. El
-        # equivalente en doctor-service (GET /api/medicos/usuario/{id}) SI funciona; el
-        # SecurityConfig de paciente-service es estructuralmente identico. No se pudo
-        # resolver la causa raiz exacta dentro del tiempo de la 8.4 (se investigo a fondo:
-        # se descarto cache de clases, estado del proceso, y se aislo que basta agregar la
-        # regla "requestMatchers(GET, \"/api/pacientes\").hasAnyRole(...)" para que aparezca,
-        # incluso con un matcher explicito de respaldo para "/usuario/**"). Este test documenta
-        # el comportamiento actual -- cuando se corrija, cambiar la asercion a 200.
-        "Obtener paciente por usuarioId (propio, PACIENTE) -> 403 (BUG CONOCIDO, deberia ser 200)",
+        # Bug #67 RESUELTO: antes daba 403 siempre. La causa real era que findByUsuarioId
+        # reventaba con NonUniqueResultException (un paciente soft-deleted compartia usuarioId)
+        # y, al no estar manejada esa excepcion, el 500 se disfrazaba de 403 via el forward a
+        # /error (donde HeaderAuthFilter no corre). Fix: findByUsuarioIdAndActivoTrue + handler
+        # de fallback en GlobalExceptionHandler. Ahora devuelve 200.
+        "Obtener paciente por usuarioId (propio, PACIENTE) -> 200",
         "GET", "{{baseUrl}}/api/pacientes/usuario/{{usuarioIdPaciente}}",
         headers=auth_header("jwtPaciente"),
         tests=[
-            "pm.test('403 Forbidden (bug conocido, ver descripcion del request)', () => pm.response.to.have.status(403));"
+            "pm.test('200 OK', () => pm.response.to.have.status(200));",
+            "// Fijar pacienteId al paciente del propio jwtPaciente (Lucia): asi la cita de la",
+            "// carpeta '4. Citas' se reserva para ELLA y luego 'ver lo propio' sobre su atencion",
+            "// funciona (si se usara otro paciente, el control de propiedad daria 403 legitimo).",
+            "pm.collectionVariables.set('pacienteId', pm.response.json().id);"
         ]
     ),
     req(
@@ -332,10 +331,14 @@ citas_items = [
             "fechaHora": "{{fechaCitaUnica}}", "motivo": "Control coleccion 8.4"
         }, ensure_ascii=False, indent=2),
         prerequest=[
-            "const base = Date.now() % 100000000;",
-            "const dt = new Date(2031, 0, 1 + (base % 300), 8 + (base % 10), 0, 0);",
+            "// Fecha unica de verdad: base 2031-01-01 + un offset en segundos derivado del epoch",
+            "// actual (resolucion de 1s sobre un rango de ~300 dias). Dos corridas separadas por",
+            "// >=1s no colisionan -> evita el 409 por el constraint unico (medicoId, fechaHora).",
+            "const base = new Date(2031, 0, 1, 0, 0, 0).getTime();",
+            "const offsetSec = Math.floor(Date.now() / 1000) % (300 * 24 * 3600);",
+            "const dt = new Date(base + offsetSec * 1000);",
             "pm.collectionVariables.set('fechaCitaUnica', dt.toISOString().slice(0, 19));",
-            "const dt2 = new Date(dt.getTime() + 24 * 60 * 60 * 1000);",
+            "const dt2 = new Date(dt.getTime() + 7 * 24 * 60 * 60 * 1000);",
             "pm.collectionVariables.set('fechaReprogramadaUnica', dt2.toISOString().slice(0, 19));",
         ],
         tests=[
@@ -411,24 +414,21 @@ historial_items = [
         tests=["pm.test('200 OK', () => pm.response.to.have.status(200));"]
     ),
     req(
-        # BUG CONOCIDO EN CASCADA (mismo origen que en "1. Paciente"): este endpoint resuelve
-        # "ver solo lo propio" llamando por Feign a GET /api/pacientes/usuario/{usuarioId}
-        # (PacienteClient.obtenerPorUsuarioId) -- el mismo endpoint roto en paciente-service.
-        # El circuit breaker agota reintentos y cae al fallback -> 503. Documentado, no corregido
-        # aqui. Cuando se arregle el bug de paciente-service, esto deberia volver a 200 solo.
-        "Mis atenciones (PACIENTE, ver solo lo propio) -> 503 (BUG CONOCIDO, deberia ser 200)",
+        # Bug #67 RESUELTO (era cascada del 403/500 de paciente-service): este endpoint resuelve
+        # "ver solo lo propio" llamando por Feign a GET /api/pacientes/usuario/{usuarioId}. Con
+        # aquel endpoint arreglado, la llamada interna ya no falla y el circuit breaker no se
+        # dispara -> 200.
+        "Mis atenciones (PACIENTE, ver solo lo propio) -> 200",
         "GET", "{{baseUrl}}/api/atenciones/mis-atenciones",
         headers=auth_header("jwtPaciente"),
-        tests=[
-            "pm.test('503 Service Unavailable (bug conocido, ver descripcion)', () => pm.response.to.have.status(503));"
-        ]
+        tests=["pm.test('200 OK', () => pm.response.to.have.status(200));"]
     ),
     req(
-        "Obtener atencion por id (propietario) -> 503 (BUG CONOCIDO, deberia ser 200)",
+        "Obtener atencion por id (propietario) -> 200",
         "GET", "{{baseUrl}}/api/atenciones/{{atencionId}}",
         headers=auth_header("jwtPaciente"),
         tests=[
-            "pm.test('503 Service Unavailable (bug conocido, ver descripcion)', () => pm.response.to.have.status(503));"
+            "pm.test('200 OK', () => pm.response.to.have.status(200));"
         ]
     ),
     req(

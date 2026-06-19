@@ -40,4 +40,18 @@ public class GlobalExceptionHandler {
                 .orElse("Datos invalidos");
         return ResponseEntity.badRequest().body(body(HttpStatus.BAD_REQUEST, msg));
     }
+
+    /**
+     * Fallback para cualquier excepción no controlada arriba. Sin esto, una excepción
+     * inesperada (p. ej. un NonUniqueResultException de datos inconsistentes) escala al
+     * contenedor, que hace un forward interno a /error; Spring Security re-evalúa ese
+     * dispatch sin la identidad propagada por HeaderAuthFilter (no corre en error dispatch)
+     * y lo deniega con 403 — enmascarando el error real. Manejándola aquí devolvemos un
+     * 500 con cuerpo claro, sin pasar por /error.
+     */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> noControlada(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(body(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno: " + ex.getMessage()));
+    }
 }
