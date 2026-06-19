@@ -1,2 +1,9 @@
 <h1>Gestión de Citas Médicas</h1>
 <p>Frontend conectado al gateway en {{ apiUrl }}</p>
+
+@if (auth.estaAutenticado()) {
+  <p>Bienvenido, {{ auth.getNombres() }} ({{ auth.getRol() }})</p>
+  <button (click)="cerrarSesion()">Cerrar sesión</button>
+} @else {
+  <p><a routerLink="/login">Iniciar sesión</a> · <a routerLink="/registro">Registrarme</a></p>
+}

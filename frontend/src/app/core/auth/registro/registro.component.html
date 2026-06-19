@@ -1,0 +1,35 @@
+<h2>Registro de paciente</h2>
+
+@if (exito) {
+  <p>Cuenta creada. Redirigiendo al login...</p>
+} @else {
+  <form (ngSubmit)="enviar()">
+    <div>
+      <label>Nombres</label>
+      <input type="text" name="nombres" [(ngModel)]="nombres" required />
+    </div>
+    <div>
+      <label>Apellidos</label>
+      <input type="text" name="apellidos" [(ngModel)]="apellidos" required />
+    </div>
+    <div>
+      <label>Email</label>
+      <input type="email" name="email" [(ngModel)]="email" required />
+    </div>
+    <div>
+      <label>Contraseña</label>
+      <input type="password" name="password" [(ngModel)]="password" required minlength="6" />
+    </div>
+    <div>
+      <label>Teléfono</label>
+      <input type="text" name="telefono" [(ngModel)]="telefono" />
+    </div>
+    <button type="submit">Crear cuenta</button>
+  </form>
+
+  @if (error) {
+    <p>{{ error }}</p>
+  }
+}
+
+<p>¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión</a></p>

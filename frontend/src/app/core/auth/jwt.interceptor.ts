@@ -1,0 +1,15 @@
+import { HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { AuthService } from './auth.service';
+
+/**
+ * Agrega "Authorization: Bearer <token>" a cada peticion saliente, si hay sesion.
+ * Sin esto, ninguna pantalla protegida podria llamar al backend a traves del gateway.
+ */
+export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
+  const token = inject(AuthService).getToken();
+  if (!token) {
+    return next(req);
+  }
+  return next(req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }));
+};
