@@ -14,3 +14,6 @@ target/
 # Archivos temporales de editores
 *.tmp
 *.tmp.*
+
+# Variables de entorno locales (secretos reales, no subir)
+.env
