@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -69,6 +70,21 @@ class PacienteServiceTest {
         assertThat(resultado.dni()).isEqualTo("70123456");
         assertThat(resultado.nombres()).isEqualTo("Lucia");
         verify(pacienteRepository).save(any(Paciente.class));
+    }
+
+    @Test
+    void listar_devuelveSoloLosActivos() {
+        Paciente activo = new Paciente();
+        activo.setId(1L);
+        activo.setDni("70000001");
+        activo.setActivo(true);
+        when(pacienteRepository.findByActivoTrue()).thenReturn(List.of(activo));
+
+        List<PacienteDTO> resultado = pacienteService.listar();
+
+        assertThat(resultado).hasSize(1);
+        assertThat(resultado.get(0).dni()).isEqualTo("70000001");
+        verify(pacienteRepository, never()).findAll();
     }
 
     @Test

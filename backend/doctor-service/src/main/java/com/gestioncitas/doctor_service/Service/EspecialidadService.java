@@ -33,7 +33,7 @@ public class EspecialidadService {
 
     @Transactional(readOnly = true)
     public List<EspecialidadDTO> listar() {
-        return especialidadRepository.findAll().stream().map(EspecialidadDTO::from).toList();
+        return especialidadRepository.findByActivoTrue().stream().map(EspecialidadDTO::from).toList();
     }
 
     @Transactional(readOnly = true)

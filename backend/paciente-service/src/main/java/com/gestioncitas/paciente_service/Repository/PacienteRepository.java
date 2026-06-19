@@ -3,11 +3,14 @@ package com.gestioncitas.paciente_service.Repository;
 import com.gestioncitas.paciente_service.Entity.Paciente;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface PacienteRepository extends JpaRepository<Paciente, Long> {
 
     boolean existsByDni(String dni);
+
+    List<Paciente> findByActivoTrue();
 
     Optional<Paciente> findByDni(String dni);
 

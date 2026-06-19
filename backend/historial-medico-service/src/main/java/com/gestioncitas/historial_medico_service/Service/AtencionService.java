@@ -59,7 +59,7 @@ public class AtencionService {
 
     @Transactional(readOnly = true)
     public List<AtencionDTO> listar() {
-        return atencionRepository.findAll().stream().map(AtencionDTO::from).toList();
+        return atencionRepository.findByActivoTrue().stream().map(AtencionDTO::from).toList();
     }
 
     @Transactional(readOnly = true)
@@ -71,12 +71,12 @@ public class AtencionService {
 
     @Transactional(readOnly = true)
     public List<AtencionDTO> listarPorPaciente(Long pacienteId) {
-        return atencionRepository.findByPacienteId(pacienteId).stream().map(AtencionDTO::from).toList();
+        return atencionRepository.findByPacienteIdAndActivoTrue(pacienteId).stream().map(AtencionDTO::from).toList();
     }
 
     @Transactional(readOnly = true)
     public List<AtencionDTO> listarPorMedico(Long medicoId) {
-        return atencionRepository.findByMedicoId(medicoId).stream().map(AtencionDTO::from).toList();
+        return atencionRepository.findByMedicoIdAndActivoTrue(medicoId).stream().map(AtencionDTO::from).toList();
     }
 
     @Transactional

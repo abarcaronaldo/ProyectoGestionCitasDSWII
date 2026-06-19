@@ -43,7 +43,7 @@ public class MedicoService {
 
     @Transactional(readOnly = true)
     public List<MedicoDTO> listar() {
-        return medicoRepository.findAll().stream().map(MedicoDTO::from).toList();
+        return medicoRepository.findByActivoTrue().stream().map(MedicoDTO::from).toList();
     }
 
     @Transactional(readOnly = true)
@@ -55,7 +55,7 @@ public class MedicoService {
 
     @Transactional(readOnly = true)
     public List<MedicoDTO> listarPorEspecialidad(Long especialidadId) {
-        return medicoRepository.findByEspecialidadId(especialidadId).stream().map(MedicoDTO::from).toList();
+        return medicoRepository.findByEspecialidadIdAndActivoTrue(especialidadId).stream().map(MedicoDTO::from).toList();
     }
 
     @Transactional(readOnly = true)

@@ -21,7 +21,7 @@ public class UsuarioService {
 
     @Transactional(readOnly = true)
     public List<UsuarioDTO> listar() {
-        return usuarioRepository.findAll().stream().map(UsuarioDTO::from).toList();
+        return usuarioRepository.findByActivoTrue().stream().map(UsuarioDTO::from).toList();
     }
 
     @Transactional(readOnly = true)

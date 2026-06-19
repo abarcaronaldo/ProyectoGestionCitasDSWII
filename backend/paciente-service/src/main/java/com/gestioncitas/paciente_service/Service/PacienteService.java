@@ -42,7 +42,7 @@ public class PacienteService {
 
     @Transactional(readOnly = true)
     public List<PacienteDTO> listar() {
-        return pacienteRepository.findAll().stream().map(PacienteDTO::from).toList();
+        return pacienteRepository.findByActivoTrue().stream().map(PacienteDTO::from).toList();
     }
 
     @Transactional(readOnly = true)

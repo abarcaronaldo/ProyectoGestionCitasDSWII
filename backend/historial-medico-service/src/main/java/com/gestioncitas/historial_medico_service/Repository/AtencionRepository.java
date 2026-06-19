@@ -15,4 +15,10 @@ public interface AtencionRepository extends JpaRepository<Atencion, Long> {
     List<Atencion> findByPacienteId(Long pacienteId);
 
     List<Atencion> findByMedicoId(Long medicoId);
+
+    List<Atencion> findByActivoTrue();
+
+    List<Atencion> findByPacienteIdAndActivoTrue(Long pacienteId);
+
+    List<Atencion> findByMedicoIdAndActivoTrue(Long medicoId);
 }
