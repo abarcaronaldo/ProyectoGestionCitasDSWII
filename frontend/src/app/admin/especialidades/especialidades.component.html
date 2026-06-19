@@ -5,49 +5,53 @@
   <a routerLink="/admin/reportes">Ir a reportes</a>
 </p>
 
-<h3>Crear especialidad</h3>
-<form (ngSubmit)="crear()">
-  <div>
-    <label>Nombre</label>
-    <input type="text" name="nombre" [(ngModel)]="nombre" required />
-  </div>
-  <div>
-    <label>Descripción</label>
-    <input type="text" name="descripcion" [(ngModel)]="descripcion" />
-  </div>
-  <button type="submit">Crear</button>
-</form>
+<div class="card">
+  <h3>Crear especialidad</h3>
+  <form (ngSubmit)="crear()">
+    <div>
+      <label>Nombre</label>
+      <input type="text" name="nombre" [(ngModel)]="nombre" required />
+    </div>
+    <div>
+      <label>Descripción</label>
+      <input type="text" name="descripcion" [(ngModel)]="descripcion" />
+    </div>
+    <button type="submit">Crear</button>
+  </form>
 
-@if (error) {
-  <p>{{ error }}</p>
-}
-
-<h3>Listado</h3>
-@if (cargando) {
-  <p>Cargando...</p>
-} @else {
-  @if (especialidades.length === 0) {
-    <p>No hay especialidades registradas.</p>
-  } @else {
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nombre</th>
-          <th>Descripción</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (e of especialidades; track e.id) {
-          <tr>
-            <td>{{ e.id }}</td>
-            <td>{{ e.nombre }}</td>
-            <td>{{ e.descripcion }}</td>
-            <td><button (click)="eliminar(e)">Eliminar</button></td>
-          </tr>
-        }
-      </tbody>
-    </table>
+  @if (error) {
+    <p class="error">{{ error }}</p>
   }
-}
+</div>
+
+<div class="card">
+  <h3>Listado</h3>
+  @if (cargando) {
+    <p>Cargando...</p>
+  } @else {
+    @if (especialidades.length === 0) {
+      <p>No hay especialidades registradas.</p>
+    } @else {
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (e of especialidades; track e.id) {
+            <tr>
+              <td>{{ e.id }}</td>
+              <td>{{ e.nombre }}</td>
+              <td>{{ e.descripcion }}</td>
+              <td><button (click)="eliminar(e)">Eliminar</button></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  }
+</div>

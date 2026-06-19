@@ -1,19 +1,21 @@
-<h2>Iniciar sesión</h2>
+<div class="card card-estrecho">
+  <h2>Iniciar sesión</h2>
 
-<form (ngSubmit)="enviar()">
-  <div>
-    <label>Email</label>
-    <input type="email" name="email" [(ngModel)]="email" required />
-  </div>
-  <div>
-    <label>Contraseña</label>
-    <input type="password" name="password" [(ngModel)]="password" required />
-  </div>
-  <button type="submit">Entrar</button>
-</form>
+  <form (ngSubmit)="enviar()">
+    <div>
+      <label>Email</label>
+      <input type="email" name="email" [(ngModel)]="email" required />
+    </div>
+    <div>
+      <label>Contraseña</label>
+      <input type="password" name="password" [(ngModel)]="password" required />
+    </div>
+    <button type="submit">Entrar</button>
+  </form>
 
-@if (error) {
-  <p>{{ error }}</p>
-}
+  @if (error) {
+    <p class="error">{{ error }}</p>
+  }
 
-<p>¿No tienes cuenta? <a routerLink="/registro">Regístrate</a></p>
+  <p>¿No tienes cuenta? <a routerLink="/registro">Regístrate</a></p>
+</div>

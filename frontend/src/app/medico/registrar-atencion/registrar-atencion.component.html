@@ -1,31 +1,33 @@
 <h2>Registrar atención — cita #{{ citaId }}</h2>
 
-@if (exito) {
-  <p>Atención registrada. Volviendo a mi agenda...</p>
-} @else {
-  <form (ngSubmit)="enviar()">
-    <div>
-      <label>Motivo de consulta</label>
-      <input type="text" name="motivoConsulta" [(ngModel)]="motivoConsulta" required />
-    </div>
-    <div>
-      <label>Diagnóstico</label>
-      <input type="text" name="diagnostico" [(ngModel)]="diagnostico" required />
-    </div>
-    <div>
-      <label>Tratamiento</label>
-      <input type="text" name="tratamiento" [(ngModel)]="tratamiento" />
-    </div>
-    <div>
-      <label>Observaciones</label>
-      <input type="text" name="observaciones" [(ngModel)]="observaciones" />
-    </div>
-    <button type="submit">Guardar</button>
-  </form>
+<div class="card card-estrecho">
+  @if (exito) {
+    <p>Atención registrada. Volviendo a mi agenda...</p>
+  } @else {
+    <form (ngSubmit)="enviar()">
+      <div>
+        <label>Motivo de consulta</label>
+        <input type="text" name="motivoConsulta" [(ngModel)]="motivoConsulta" required />
+      </div>
+      <div>
+        <label>Diagnóstico</label>
+        <input type="text" name="diagnostico" [(ngModel)]="diagnostico" required />
+      </div>
+      <div>
+        <label>Tratamiento</label>
+        <input type="text" name="tratamiento" [(ngModel)]="tratamiento" />
+      </div>
+      <div>
+        <label>Observaciones</label>
+        <input type="text" name="observaciones" [(ngModel)]="observaciones" />
+      </div>
+      <button type="submit" class="btn-verde">Guardar</button>
+    </form>
 
-  @if (error) {
-    <p>{{ error }}</p>
+    @if (error) {
+      <p class="error">{{ error }}</p>
+    }
   }
-}
+</div>
 
 <p><a routerLink="/medico/mi-agenda">Volver a mi agenda</a></p>

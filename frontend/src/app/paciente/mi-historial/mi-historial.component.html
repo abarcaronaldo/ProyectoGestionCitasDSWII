@@ -1,36 +1,38 @@
 <h2>Mi historial médico</h2>
 
-@if (cargando) {
-  <p>Cargando...</p>
-} @else {
-  @if (atenciones.length === 0) {
-    <p>No tienes atenciones registradas.</p>
+<div class="card">
+  @if (cargando) {
+    <p>Cargando...</p>
   } @else {
-    <table>
-      <thead>
-        <tr>
-          <th>Fecha</th>
-          <th>Motivo</th>
-          <th>Diagnóstico</th>
-          <th>Tratamiento</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (a of atenciones; track a.id) {
+    @if (atenciones.length === 0) {
+      <p>No tienes atenciones registradas.</p>
+    } @else {
+      <table>
+        <thead>
           <tr>
-            <td>{{ a.fechaAtencion }}</td>
-            <td>{{ a.motivoConsulta }}</td>
-            <td>{{ a.diagnostico }}</td>
-            <td>{{ a.tratamiento }}</td>
+            <th>Fecha</th>
+            <th>Motivo</th>
+            <th>Diagnóstico</th>
+            <th>Tratamiento</th>
           </tr>
-        }
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          @for (a of atenciones; track a.id) {
+            <tr>
+              <td>{{ a.fechaAtencion }}</td>
+              <td>{{ a.motivoConsulta }}</td>
+              <td>{{ a.diagnostico }}</td>
+              <td>{{ a.tratamiento }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
   }
-}
 
-@if (error) {
-  <p>{{ error }}</p>
-}
+  @if (error) {
+    <p class="error">{{ error }}</p>
+  }
+</div>
 
 <p><a routerLink="/paciente/mis-citas">Volver a mis citas</a></p>

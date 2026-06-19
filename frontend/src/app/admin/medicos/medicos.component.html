@@ -5,72 +5,76 @@
   <a routerLink="/admin/reportes">Ir a reportes</a>
 </p>
 
-<h3>Crear médico</h3>
-<form (ngSubmit)="crear()">
-  <div>
-    <label>Nombres</label>
-    <input type="text" name="nombres" [(ngModel)]="nombres" required />
-  </div>
-  <div>
-    <label>Apellidos</label>
-    <input type="text" name="apellidos" [(ngModel)]="apellidos" required />
-  </div>
-  <div>
-    <label>CMP</label>
-    <input type="text" name="cmp" [(ngModel)]="cmp" required />
-  </div>
-  <div>
-    <label>Teléfono</label>
-    <input type="text" name="telefono" [(ngModel)]="telefono" />
-  </div>
-  <div>
-    <label>Email</label>
-    <input type="email" name="email" [(ngModel)]="email" />
-  </div>
-  <div>
-    <label>Especialidad</label>
-    <select name="especialidadId" [(ngModel)]="especialidadId" required>
-      <option [ngValue]="null" disabled>Selecciona una especialidad</option>
-      @for (e of especialidades; track e.id) {
-        <option [ngValue]="e.id">{{ e.nombre }}</option>
-      }
-    </select>
-  </div>
-  <button type="submit">Crear</button>
-</form>
-
-@if (error) {
-  <p>{{ error }}</p>
-}
-
-<h3>Listado</h3>
-@if (cargando) {
-  <p>Cargando...</p>
-} @else {
-  @if (medicos.length === 0) {
-    <p>No hay médicos registrados.</p>
-  } @else {
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nombre</th>
-          <th>CMP</th>
-          <th>Especialidad</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (m of medicos; track m.id) {
-          <tr>
-            <td>{{ m.id }}</td>
-            <td>{{ m.nombres }} {{ m.apellidos }}</td>
-            <td>{{ m.cmp }}</td>
-            <td>{{ m.especialidadNombre }}</td>
-            <td><button (click)="eliminar(m)">Eliminar</button></td>
-          </tr>
+<div class="card">
+  <h3>Crear médico</h3>
+  <form (ngSubmit)="crear()">
+    <div>
+      <label>Nombres</label>
+      <input type="text" name="nombres" [(ngModel)]="nombres" required />
+    </div>
+    <div>
+      <label>Apellidos</label>
+      <input type="text" name="apellidos" [(ngModel)]="apellidos" required />
+    </div>
+    <div>
+      <label>CMP</label>
+      <input type="text" name="cmp" [(ngModel)]="cmp" required />
+    </div>
+    <div>
+      <label>Teléfono</label>
+      <input type="text" name="telefono" [(ngModel)]="telefono" />
+    </div>
+    <div>
+      <label>Email</label>
+      <input type="email" name="email" [(ngModel)]="email" />
+    </div>
+    <div>
+      <label>Especialidad</label>
+      <select name="especialidadId" [(ngModel)]="especialidadId" required>
+        <option [ngValue]="null" disabled>Selecciona una especialidad</option>
+        @for (e of especialidades; track e.id) {
+          <option [ngValue]="e.id">{{ e.nombre }}</option>
         }
-      </tbody>
-    </table>
+      </select>
+    </div>
+    <button type="submit">Crear</button>
+  </form>
+
+  @if (error) {
+    <p class="error">{{ error }}</p>
   }
-}
+</div>
+
+<div class="card">
+  <h3>Listado</h3>
+  @if (cargando) {
+    <p>Cargando...</p>
+  } @else {
+    @if (medicos.length === 0) {
+      <p>No hay médicos registrados.</p>
+    } @else {
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>CMP</th>
+            <th>Especialidad</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (m of medicos; track m.id) {
+            <tr>
+              <td>{{ m.id }}</td>
+              <td>{{ m.nombres }} {{ m.apellidos }}</td>
+              <td>{{ m.cmp }}</td>
+              <td>{{ m.especialidadNombre }}</td>
+              <td><button (click)="eliminar(m)">Eliminar</button></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  }
+</div>

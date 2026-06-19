@@ -1,31 +1,33 @@
-<h1>Gestión de Citas Médicas</h1>
-<p>Frontend conectado al gateway en {{ apiUrl }}</p>
+<div class="card">
+  <h1>Gestión de Citas Médicas</h1>
+  <p>Frontend conectado al gateway en {{ apiUrl }}</p>
 
-@if (auth.estaAutenticado()) {
-  <p>Bienvenido, {{ auth.getNombres() }} ({{ auth.getRol() }})</p>
-  <button (click)="cerrarSesion()">Cerrar sesión</button>
+  @if (auth.estaAutenticado()) {
+    <p>Bienvenido, {{ auth.getNombres() }} ({{ auth.getRol() }})</p>
+    <button (click)="cerrarSesion()">Cerrar sesión</button>
 
-  @if (auth.getRol() === 'PACIENTE') {
-    <p>
-      <a routerLink="/paciente/mis-citas">Mis citas</a> ·
-      <a routerLink="/paciente/reservar-cita">Reservar cita</a> ·
-      <a routerLink="/paciente/mi-historial">Mi historial</a>
-    </p>
+    @if (auth.getRol() === 'PACIENTE') {
+      <p>
+        <a routerLink="/paciente/mis-citas">Mis citas</a> ·
+        <a routerLink="/paciente/reservar-cita">Reservar cita</a> ·
+        <a routerLink="/paciente/mi-historial">Mi historial</a>
+      </p>
+    }
+
+    @if (auth.getRol() === 'MEDICO') {
+      <p>
+        <a routerLink="/medico/mi-agenda">Mi agenda</a>
+      </p>
+    }
+
+    @if (auth.getRol() === 'ADMIN' || auth.getRol() === 'RECEPCIONISTA') {
+      <p>
+        <a routerLink="/admin/medicos">Médicos</a> ·
+        <a routerLink="/admin/especialidades">Especialidades</a> ·
+        <a routerLink="/admin/reportes">Reportes</a>
+      </p>
+    }
+  } @else {
+    <p><a routerLink="/login">Iniciar sesión</a> · <a routerLink="/registro">Registrarme</a></p>
   }
-
-  @if (auth.getRol() === 'MEDICO') {
-    <p>
-      <a routerLink="/medico/mi-agenda">Mi agenda</a>
-    </p>
-  }
-
-  @if (auth.getRol() === 'ADMIN' || auth.getRol() === 'RECEPCIONISTA') {
-    <p>
-      <a routerLink="/admin/medicos">Médicos</a> ·
-      <a routerLink="/admin/especialidades">Especialidades</a> ·
-      <a routerLink="/admin/reportes">Reportes</a>
-    </p>
-  }
-} @else {
-  <p><a routerLink="/login">Iniciar sesión</a> · <a routerLink="/registro">Registrarme</a></p>
-}
+</div>
