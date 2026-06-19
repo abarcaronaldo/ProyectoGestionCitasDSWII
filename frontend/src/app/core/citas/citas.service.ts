@@ -23,4 +23,12 @@ export class CitasService {
   reprogramar(citaId: number, datos: ReprogramarCitaRequest): Observable<CitaDTO> {
     return this.http.patch<CitaDTO>(`${environment.apiUrl}/api/citas/${citaId}/reprogramar`, datos);
   }
+
+  listarPorMedico(medicoId: number): Observable<CitaDTO[]> {
+    return this.http.get<CitaDTO[]>(`${environment.apiUrl}/api/citas/medico/${medicoId}`);
+  }
+
+  marcarAsistencia(citaId: number, asistio: boolean): Observable<CitaDTO> {
+    return this.http.patch<CitaDTO>(`${environment.apiUrl}/api/citas/${citaId}/asistencia`, { asistio });
+  }
 }

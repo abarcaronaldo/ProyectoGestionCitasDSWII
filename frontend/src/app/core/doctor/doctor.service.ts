@@ -15,4 +15,8 @@ export class DoctorService {
   listarEspecialidades(): Observable<EspecialidadDTO[]> {
     return this.http.get<EspecialidadDTO[]>(`${environment.apiUrl}/api/especialidades`);
   }
+
+  obtenerPorUsuarioId(usuarioId: number): Observable<MedicoDTO> {
+    return this.http.get<MedicoDTO>(`${environment.apiUrl}/api/medicos/usuario/${usuarioId}`);
+  }
 }

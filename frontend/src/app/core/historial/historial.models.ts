@@ -11,3 +11,11 @@ export interface AtencionDTO {
   activo: boolean;
   creadoEn: string;
 }
+
+export interface AtencionCrearRequest {
+  citaId: number;
+  motivoConsulta: string;
+  diagnostico: string;
+  tratamiento?: string;
+  observaciones?: string;
+}

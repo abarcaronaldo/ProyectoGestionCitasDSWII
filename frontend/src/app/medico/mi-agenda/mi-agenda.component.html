@@ -1,0 +1,47 @@
+<h2>Mi agenda</h2>
+
+@if (cargando) {
+  <p>Cargando...</p>
+} @else {
+  @if (citas.length === 0) {
+    <p>No tienes citas asignadas.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Fecha</th>
+          <th>Estado</th>
+          <th>Motivo</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (cita of citas; track cita.id) {
+          <tr>
+            <td>{{ cita.id }}</td>
+            <td>{{ cita.fechaHora }}</td>
+            <td>{{ cita.estado }}</td>
+            <td>{{ cita.motivo }}</td>
+            <td>
+              @if (cita.estado === 'RESERVADA') {
+                <button (click)="marcarAsistencia(cita, true)">Marcar atendido</button>
+                <button (click)="marcarAsistencia(cita, false)">No asistió</button>
+              }
+              @if (cita.estado === 'ATENDIDA' && !tieneAtencionRegistrada(cita)) {
+                <a [routerLink]="['/medico/registrar-atencion', cita.id]">Registrar atención</a>
+              }
+              @if (cita.estado === 'ATENDIDA' && tieneAtencionRegistrada(cita)) {
+                <span>Atención ya registrada</span>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+}
+
+@if (error) {
+  <p>{{ error }}</p>
+}

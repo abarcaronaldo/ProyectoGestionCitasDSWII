@@ -12,6 +12,12 @@
       <a routerLink="/paciente/mi-historial">Mi historial</a>
     </p>
   }
+
+  @if (auth.getRol() === 'MEDICO') {
+    <p>
+      <a routerLink="/medico/mi-agenda">Mi agenda</a>
+    </p>
+  }
 } @else {
   <p><a routerLink="/login">Iniciar sesión</a> · <a routerLink="/registro">Registrarme</a></p>
 }
