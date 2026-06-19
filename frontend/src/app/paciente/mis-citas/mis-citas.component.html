@@ -1,0 +1,42 @@
+<h2>Mis citas</h2>
+
+<p><a routerLink="/paciente/reservar-cita">Reservar nueva cita</a></p>
+
+@if (cargando) {
+  <p>Cargando...</p>
+} @else {
+  @if (citas.length === 0) {
+    <p>No tienes citas registradas.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Fecha</th>
+          <th>Estado</th>
+          <th>Motivo</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (cita of citas; track cita.id) {
+          <tr>
+            <td>{{ cita.id }}</td>
+            <td>{{ cita.fechaHora }}</td>
+            <td>{{ cita.estado }}</td>
+            <td>{{ cita.motivo }}</td>
+            <td>
+              @if (cita.estado === 'RESERVADA') {
+                <button (click)="cancelar(cita)">Cancelar</button>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+}
+
+@if (error) {
+  <p>{{ error }}</p>
+}

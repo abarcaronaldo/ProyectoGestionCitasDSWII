@@ -7,6 +7,7 @@ import { LoginRequest, RegistroRequest, TokenResponse, UsuarioResponse } from '.
 const TOKEN_KEY = 'efsrt_token';
 const ROL_KEY = 'efsrt_rol';
 const NOMBRES_KEY = 'efsrt_nombres';
+const USUARIO_ID_KEY = 'efsrt_usuario_id';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -18,6 +19,7 @@ export class AuthService {
         localStorage.setItem(TOKEN_KEY, res.token);
         localStorage.setItem(ROL_KEY, res.rol);
         localStorage.setItem(NOMBRES_KEY, res.nombres);
+        localStorage.setItem(USUARIO_ID_KEY, String(res.usuarioId));
       })
     );
   }
@@ -30,6 +32,7 @@ export class AuthService {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(ROL_KEY);
     localStorage.removeItem(NOMBRES_KEY);
+    localStorage.removeItem(USUARIO_ID_KEY);
   }
 
   getToken(): string | null {
@@ -42,6 +45,11 @@ export class AuthService {
 
   getNombres(): string | null {
     return localStorage.getItem(NOMBRES_KEY);
+  }
+
+  getUsuarioId(): number | null {
+    const valor = localStorage.getItem(USUARIO_ID_KEY);
+    return valor ? Number(valor) : null;
   }
 
   estaAutenticado(): boolean {
