@@ -22,7 +22,8 @@
   @if (auth.getRol() === 'ADMIN' || auth.getRol() === 'RECEPCIONISTA') {
     <p>
       <a routerLink="/admin/medicos">Médicos</a> ·
-      <a routerLink="/admin/especialidades">Especialidades</a>
+      <a routerLink="/admin/especialidades">Especialidades</a> ·
+      <a routerLink="/admin/reportes">Reportes</a>
     </p>
   }
 } @else {

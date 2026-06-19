@@ -1,0 +1,106 @@
+<h2>Reportes</h2>
+
+<p>
+  <a routerLink="/admin/medicos">Ir a médicos</a> |
+  <a routerLink="/admin/especialidades">Ir a especialidades</a>
+</p>
+
+@if (error) {
+  <p>{{ error }}</p>
+}
+
+<h3>Resumen general</h3>
+@if (resumenGeneral) {
+  <table>
+    <thead>
+      <tr>
+        <th>Reservadas</th>
+        <th>Atendidas</th>
+        <th>Canceladas</th>
+        <th>No asistió</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{ resumenGeneral.totalReservadas }}</td>
+        <td>{{ resumenGeneral.totalAtendidas }}</td>
+        <td>{{ resumenGeneral.totalCanceladas }}</td>
+        <td>{{ resumenGeneral.totalNoAsistio }}</td>
+        <td>{{ resumenGeneral.total }}</td>
+      </tr>
+    </tbody>
+  </table>
+} @else {
+  <p>Cargando...</p>
+}
+
+<h3>Reporte por médico</h3>
+<div>
+  <label>Médico</label>
+  <select name="medicoId" [(ngModel)]="medicoId" (ngModelChange)="consultarPorMedico()">
+    <option [ngValue]="null" disabled>Selecciona un médico</option>
+    @for (m of medicos; track m.id) {
+      <option [ngValue]="m.id">{{ m.nombres }} {{ m.apellidos }}</option>
+    }
+  </select>
+</div>
+@if (resumenMedico) {
+  <table>
+    <thead>
+      <tr>
+        <th>Médico</th>
+        <th>Reservadas</th>
+        <th>Atendidas</th>
+        <th>Canceladas</th>
+        <th>No asistió</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{ resumenMedico.medicoNombre }}</td>
+        <td>{{ resumenMedico.totalReservadas }}</td>
+        <td>{{ resumenMedico.totalAtendidas }}</td>
+        <td>{{ resumenMedico.totalCanceladas }}</td>
+        <td>{{ resumenMedico.totalNoAsistio }}</td>
+        <td>{{ resumenMedico.total }}</td>
+      </tr>
+    </tbody>
+  </table>
+}
+
+<h3>Reporte por especialidad</h3>
+<div>
+  <label>Especialidad</label>
+  <select name="especialidadId" [(ngModel)]="especialidadId" (ngModelChange)="consultarPorEspecialidad()">
+    <option [ngValue]="null" disabled>Selecciona una especialidad</option>
+    @for (e of especialidades; track e.id) {
+      <option [ngValue]="e.id">{{ e.nombre }}</option>
+    }
+  </select>
+</div>
+@if (resumenEspecialidad) {
+  <table>
+    <thead>
+      <tr>
+        <th>Especialidad</th>
+        <th>Reservadas</th>
+        <th>Atendidas</th>
+        <th>Canceladas</th>
+        <th>No asistió</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{ resumenEspecialidad.especialidadNombre }}</td>
+        <td>{{ resumenEspecialidad.totalReservadas }}</td>
+        <td>{{ resumenEspecialidad.totalAtendidas }}</td>
+        <td>{{ resumenEspecialidad.totalCanceladas }}</td>
+        <td>{{ resumenEspecialidad.totalNoAsistio }}</td>
+        <td>{{ resumenEspecialidad.total }}</td>
+      </tr>
+    </tbody>
+  </table>
+}
