@@ -10,17 +10,50 @@ import { RegistrarAtencionComponent } from './medico/registrar-atencion/registra
 import { EspecialidadesComponent } from './admin/especialidades/especialidades.component';
 import { MedicosComponent } from './admin/medicos/medicos.component';
 import { ReportesComponent } from './admin/reportes/reportes.component';
+import { roleGuard } from './core/auth/role.guard';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent },
   { path: 'registro', component: RegistroComponent },
-  { path: 'paciente/mis-citas', component: MisCitasComponent },
-  { path: 'paciente/reservar-cita', component: ReservarCitaComponent },
-  { path: 'paciente/mi-historial', component: MiHistorialComponent },
-  { path: 'medico/mi-agenda', component: MiAgendaComponent },
-  { path: 'medico/registrar-atencion/:citaId', component: RegistrarAtencionComponent },
-  { path: 'admin/medicos', component: MedicosComponent },
-  { path: 'admin/especialidades', component: EspecialidadesComponent },
-  { path: 'admin/reportes', component: ReportesComponent },
+  {
+    path: 'paciente/mis-citas',
+    component: MisCitasComponent,
+    canActivate: [roleGuard(['PACIENTE'])],
+  },
+  {
+    path: 'paciente/reservar-cita',
+    component: ReservarCitaComponent,
+    canActivate: [roleGuard(['PACIENTE'])],
+  },
+  {
+    path: 'paciente/mi-historial',
+    component: MiHistorialComponent,
+    canActivate: [roleGuard(['PACIENTE'])],
+  },
+  {
+    path: 'medico/mi-agenda',
+    component: MiAgendaComponent,
+    canActivate: [roleGuard(['MEDICO'])],
+  },
+  {
+    path: 'medico/registrar-atencion/:citaId',
+    component: RegistrarAtencionComponent,
+    canActivate: [roleGuard(['MEDICO'])],
+  },
+  {
+    path: 'admin/medicos',
+    component: MedicosComponent,
+    canActivate: [roleGuard(['ADMIN', 'RECEPCIONISTA'])],
+  },
+  {
+    path: 'admin/especialidades',
+    component: EspecialidadesComponent,
+    canActivate: [roleGuard(['ADMIN', 'RECEPCIONISTA'])],
+  },
+  {
+    path: 'admin/reportes',
+    component: ReportesComponent,
+    canActivate: [roleGuard(['ADMIN', 'RECEPCIONISTA'])],
+  },
 ];

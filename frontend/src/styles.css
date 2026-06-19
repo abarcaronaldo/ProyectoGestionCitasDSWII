@@ -1,1 +1,53 @@
 /* You can add global styles to this file, and also import other style files */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
+
+.contenedor {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+form div {
+  margin-bottom: 0.5rem;
+}
+
+form label {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+input,
+select,
+button {
+  width: 100%;
+  max-width: 320px;
+  padding: 0.4rem;
+}
+
+@media (max-width: 600px) {
+  .contenedor {
+    padding: 0.5rem;
+  }
+
+  input,
+  select,
+  button {
+    max-width: 100%;
+  }
+}
