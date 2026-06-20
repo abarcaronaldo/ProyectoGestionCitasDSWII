@@ -8,6 +8,8 @@ import com.gestioncitas.citas_service.dto.ReservaCitaDTO;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,18 +35,18 @@ public class CitaController {
     }
 
     @GetMapping("/paciente/{pacienteId}")
-    public List<CitaDTO> listarPorPaciente(@PathVariable Long pacienteId) {
-        return citaService.listarPorPaciente(pacienteId);
+    public List<CitaDTO> listarPorPaciente(@PathVariable Long pacienteId, Authentication authentication) {
+        return citaService.listarPorPacienteVerificandoPropiedad(pacienteId, usuarioId(authentication), rol(authentication));
     }
 
     @GetMapping("/medico/{medicoId}")
-    public List<CitaDTO> listarPorMedico(@PathVariable Long medicoId) {
-        return citaService.listarPorMedico(medicoId);
+    public List<CitaDTO> listarPorMedico(@PathVariable Long medicoId, Authentication authentication) {
+        return citaService.listarPorMedicoVerificandoPropiedad(medicoId, usuarioId(authentication), rol(authentication));
     }
 
     @PatchMapping("/{id}/cancelar")
-    public CitaDTO cancelar(@PathVariable Long id) {
-        return citaService.cancelar(id);
+    public CitaDTO cancelar(@PathVariable Long id, Authentication authentication) {
+        return citaService.cancelarVerificandoPropiedad(id, usuarioId(authentication), rol(authentication));
     }
 
     @PatchMapping("/{id}/reprogramar")
@@ -55,5 +57,17 @@ public class CitaController {
     @PatchMapping("/{id}/asistencia")
     public CitaDTO marcarAsistencia(@PathVariable Long id, @Valid @RequestBody AsistenciaDTO dto) {
         return citaService.marcarAsistencia(id, dto.asistio());
+    }
+
+    private Long usuarioId(Authentication authentication) {
+        return Long.valueOf(authentication.getName());
+    }
+
+    private String rol(Authentication authentication) {
+        return authentication.getAuthorities().stream()
+                .findFirst()
+                .map(GrantedAuthority::getAuthority)
+                .map(a -> a.replace("ROLE_", ""))
+                .orElse("");
     }
 }

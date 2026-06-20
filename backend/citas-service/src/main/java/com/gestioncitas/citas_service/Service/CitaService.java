@@ -26,6 +26,8 @@ public class CitaService {
 
     private static final String HORARIO_OCUPADO = "El médico ya tiene una cita reservada en esa fecha y hora.";
     private static final String CONFLICTO_CONCURRENCIA = "La cita fue modificada por otro proceso. Vuelve a intentarlo.";
+    private static final String ROL_PACIENTE = "PACIENTE";
+    private static final String ROL_MEDICO = "MEDICO";
 
     private final CitaRepository citaRepository;
     private final DoctorClient doctorClient;
@@ -114,6 +116,53 @@ public class CitaService {
     @Transactional(readOnly = true)
     public List<CitaDTO> listarPorMedico(Long medicoId) {
         return citaRepository.findByMedicoId(medicoId).stream().map(CitaDTO::from).toList();
+    }
+
+    /** Un PACIENTE solo puede ver sus propias citas; ADMIN/RECEPCIONISTA pueden ver las de cualquiera. */
+    @Transactional(readOnly = true)
+    public List<CitaDTO> listarPorPacienteVerificandoPropiedad(Long pacienteId, Long usuarioId, String rol) {
+        if (ROL_PACIENTE.equals(rol) && !resolverPacienteId(usuarioId).equals(pacienteId)) {
+            throw new ApiExceptions.AccesoDenegado("Solo puedes ver tus propias citas.");
+        }
+        return listarPorPaciente(pacienteId);
+    }
+
+    /** Un MEDICO solo puede ver su propia agenda; ADMIN/RECEPCIONISTA pueden ver la de cualquiera. */
+    @Transactional(readOnly = true)
+    public List<CitaDTO> listarPorMedicoVerificandoPropiedad(Long medicoId, Long usuarioId, String rol) {
+        if (ROL_MEDICO.equals(rol) && !resolverMedicoId(usuarioId).equals(medicoId)) {
+            throw new ApiExceptions.AccesoDenegado("Solo puedes ver tu propia agenda.");
+        }
+        return listarPorMedico(medicoId);
+    }
+
+    /** Un PACIENTE solo puede cancelar su propia cita; RECEPCIONISTA/ADMIN pueden cancelar cualquiera. */
+    @Transactional
+    public CitaDTO cancelarVerificandoPropiedad(Long id, Long usuarioId, String rol) {
+        if (ROL_PACIENTE.equals(rol)) {
+            Cita cita = citaRepository.findById(id)
+                    .orElseThrow(() -> new ApiExceptions.RecursoNoEncontrado("Cita no encontrada: " + id));
+            if (!cita.getPacienteId().equals(resolverPacienteId(usuarioId))) {
+                throw new ApiExceptions.AccesoDenegado("Solo puedes cancelar tus propias citas.");
+            }
+        }
+        return cancelar(id);
+    }
+
+    private Long resolverPacienteId(Long usuarioId) {
+        try {
+            return pacienteClient.obtenerPorUsuarioId(usuarioId).id();
+        } catch (FeignException.NotFound e) {
+            throw new ApiExceptions.RecursoNoEncontrado("No hay un paciente asociado al usuario: " + usuarioId);
+        }
+    }
+
+    private Long resolverMedicoId(Long usuarioId) {
+        try {
+            return doctorClient.obtenerPorUsuarioId(usuarioId).id();
+        } catch (FeignException.NotFound e) {
+            throw new ApiExceptions.RecursoNoEncontrado("No hay un médico asociado al usuario: " + usuarioId);
+        }
     }
 
     private Cita obtenerCitaReservada(Long id) {

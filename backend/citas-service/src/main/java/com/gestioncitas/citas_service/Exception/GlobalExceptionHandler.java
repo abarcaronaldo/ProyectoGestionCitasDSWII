@@ -33,6 +33,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body(HttpStatus.CONFLICT, ex.getMessage()));
     }
 
+    @ExceptionHandler(ApiExceptions.AccesoDenegado.class)
+    public ResponseEntity<Map<String, Object>> accesoDenegado(ApiExceptions.AccesoDenegado ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body(HttpStatus.FORBIDDEN, ex.getMessage()));
+    }
+
     @ExceptionHandler(ServicioExternoNoDisponibleException.class)
     public ResponseEntity<Map<String, Object>> servicioNoDisponible(ServicioExternoNoDisponibleException ex) {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)

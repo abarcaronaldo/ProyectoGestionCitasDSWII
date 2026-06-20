@@ -10,4 +10,7 @@ public interface DoctorClient {
 
     @GetMapping("/api/medicos/{id}")
     MedicoClienteDTO obtenerMedico(@PathVariable Long id);
+
+    @GetMapping("/api/medicos/usuario/{usuarioId}")
+    MedicoClienteDTO obtenerPorUsuarioId(@PathVariable Long usuarioId);
 }

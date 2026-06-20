@@ -17,4 +17,10 @@ public final class ApiExceptions {
             super(mensaje);
         }
     }
+
+    public static class AccesoDenegado extends RuntimeException {
+        public AccesoDenegado(String mensaje) {
+            super(mensaje);
+        }
+    }
 }
