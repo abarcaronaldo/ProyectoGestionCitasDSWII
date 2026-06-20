@@ -1,0 +1,1602 @@
+{
+  "info": {
+    "name": "EFSRT V - Coleccion prueba ngrok",
+    "description": "Copia de la coleccion completa pero apuntando al tunel ngrok (https://prenatal-tapered-divorcee.ngrok-free.dev). Self-contained: importa solo este archivo. Inyecta el header ngrok-skip-browser-warning en todos los requests via script de coleccion. Corre primero la carpeta 0. Auth para llenar los jwt*.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "0. Auth",
+      "description": "Login/registro + gestion de usuarios (auth-service)",
+      "item": [
+        {
+          "name": "Registrar paciente nuevo (demo) -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/registro",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"Postman\",\n  \"apellidos\": \"Demo Paciente\",\n  \"email\": \"postman.paciente@gestion.pe\",\n  \"password\": \"Gestion2026\",\n  \"telefono\": \"999111222\",\n  \"rol\": \"PACIENTE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('201 o 409 si ya existe (rerun)', () => pm.expect([201,409]).to.include(pm.response.code));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login PACIENTE (demo: Lucia Quispe) -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"paciente.Quispe@gestion.pe\",\n  \"password\": \"Gestion2026\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('jwtPaciente', body.token);",
+                  "pm.collectionVariables.set('usuarioIdPaciente', body.usuarioId);",
+                  "pm.test('rol PACIENTE', () => pm.expect(body.rol).to.eql('PACIENTE'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login MEDICO (demo: Pedro Mamani) -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"medico.Mamani@gestion.pe\",\n  \"password\": \"Gestion2026\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('jwtMedico', body.token);",
+                  "pm.collectionVariables.set('usuarioIdMedico', body.usuarioId);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login ADMIN (demo: Ana Torres) -> 200",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@gestion.pe\",\n  \"password\": \"Gestion2026\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('jwtAdmin', body.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login fallido (password incorrecto) -> 401",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@gestion.pe\",\n  \"password\": \"clave-incorrecta\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('401 Unauthorized', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar usuarios (ADMIN) -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtAdmin}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/usuarios"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener usuario por id (ADMIN) -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtAdmin}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/usuarios/{{usuarioIdPaciente}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Actualizar usuario (ADMIN) -> 200",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtAdmin}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/usuarios/{{usuarioIdPaciente}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"Lucía\",\n  \"apellidos\": \"Quispe Ramos\",\n  \"telefono\": \"987654321\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Eliminar usuario sin ser ADMIN (PACIENTE) -> 403",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtPaciente}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/usuarios/{{usuarioIdPaciente}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('403 Forbidden', () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "1. Paciente",
+      "description": "CRUD de pacientes (paciente-service)",
+      "item": [
+        {
+          "name": "Crear paciente (ADMIN) -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtAdmin}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/pacientes",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuarioId\": 999888,\n  \"dni\": \"{{$timestamp}}\",\n  \"nombres\": \"Postman\",\n  \"apellidos\": \"Demo Paciente\",\n  \"fechaNacimiento\": \"1998-05-20\",\n  \"sexo\": \"F\",\n  \"telefono\": \"999111222\",\n  \"email\": \"postman.paciente.{{$timestamp}}@gestion.pe\",\n  \"direccion\": \"Av. Demo 100\",\n  \"grupoSanguineo\": \"O+\",\n  \"alergias\": \"Ninguna\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('201 Created (dni/email unicos por corrida via {{$timestamp}}, no deberia chocar)', () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) { pm.collectionVariables.set('pacienteIdNuevo', pm.response.json().id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar pacientes (MEDICO) -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtMedico}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/pacientes"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "if (body.length > 0) pm.collectionVariables.set('pacienteId', body[0].id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener paciente por id -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtMedico}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/pacientes/{{pacienteId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener paciente por usuarioId (propio, PACIENTE) -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtPaciente}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/pacientes/usuario/{{usuarioIdPaciente}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "// Fijar pacienteId al paciente del propio jwtPaciente (Lucia): asi la cita de la",
+                  "// carpeta '4. Citas' se reserva para ELLA y luego 'ver lo propio' sobre su atencion",
+                  "// funciona (si se usara otro paciente, el control de propiedad daria 403 legitimo).",
+                  "pm.collectionVariables.set('pacienteId', pm.response.json().id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Actualizar paciente (RECEPCIONISTA o ADMIN) -> 200",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtAdmin}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/pacientes/{{pacienteId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"Lucía\",\n  \"apellidos\": \"Quispe Ramos\",\n  \"fechaNacimiento\": \"1995-03-12\",\n  \"sexo\": \"F\",\n  \"telefono\": \"987000111\",\n  \"email\": \"paciente.Quispe@gestion.pe\",\n  \"direccion\": \"Av. Actualizada 200\",\n  \"grupoSanguineo\": \"O+\",\n  \"alergias\": \"Ninguna conocida\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear paciente sin ser ADMIN/RECEPCIONISTA (MEDICO) -> 403",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtMedico}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/pacientes",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuarioId\": 999,\n  \"dni\": \"1\",\n  \"nombres\": \"x\",\n  \"apellidos\": \"x\",\n  \"fechaNacimiento\": \"2000-01-01\",\n  \"sexo\": \"M\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('403 Forbidden', () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Eliminar paciente creado por la coleccion (ADMIN) -> 204",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtAdmin}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/pacientes/{{pacienteIdNuevo}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('204 si se creo en esta corrida, 404 si ya se habia limpiado antes', () => pm.expect([204,404]).to.include(pm.response.code));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Doctor - Especialidades",
+      "description": "CRUD de especialidades (doctor-service)",
+      "item": [
+        {
+          "name": "Crear especialidad (ADMIN) -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtAdmin}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/especialidades",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Especialidad Postman {{$timestamp}}\",\n  \"descripcion\": \"Creada por la coleccion 8.4\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('especialidadIdNueva', pm.response.json().id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar especialidades -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtPaciente}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/especialidades"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "if (body.length > 0) pm.collectionVariables.set('especialidadId', body[0].id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener especialidad por id -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtPaciente}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/especialidades/{{especialidadId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Actualizar especialidad (ADMIN) -> 200",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtAdmin}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/especialidades/{{especialidadIdNueva}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Especialidad Postman editada\",\n  \"descripcion\": \"Actualizada por la coleccion 8.4\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Eliminar especialidad creada por la coleccion (ADMIN) -> 204",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtAdmin}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/especialidades/{{especialidadIdNueva}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('204 No Content', () => pm.response.to.have.status(204));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear especialidad sin ser ADMIN (PACIENTE) -> 403",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtPaciente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/especialidades",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Hack\",\n  \"descripcion\": \"no deberia poder\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('403 Forbidden', () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Doctor - Medicos",
+      "description": "CRUD de medicos (doctor-service)",
+      "item": [
+        {
+          "name": "Listar medicos -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtPaciente}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/medicos"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "if (body.length > 0) { pm.collectionVariables.set('medicoId', body[0].id); pm.collectionVariables.set('especialidadId', body[0].especialidadId); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener medico por id -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtPaciente}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/medicos/{{medicoId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar medicos por especialidad -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtPaciente}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/medicos/especialidad/{{especialidadId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener medico por usuarioId (propio, MEDICO) -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtMedico}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/medicos/usuario/{{usuarioIdMedico}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('medicoIdPropio', pm.response.json().id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear medico (ADMIN) -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtAdmin}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/medicos",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"Postman\",\n  \"apellidos\": \"Demo Medico\",\n  \"cmp\": \"CMP{{$timestamp}}\",\n  \"telefono\": \"999222333\",\n  \"email\": \"postman.medico@gestion.pe\",\n  \"especialidadId\": \"{{especialidadId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('201 Created (CMP unico por corrida via {{$timestamp}}, no deberia chocar)', () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) { pm.collectionVariables.set('medicoIdNuevo', pm.response.json().id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Actualizar medico (ADMIN) -> 200",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtAdmin}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/medicos/{{medicoIdNuevo}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"Postman\",\n  \"apellidos\": \"Demo Medico\",\n  \"telefono\": \"999000000\",\n  \"email\": \"postman.medico@gestion.pe\",\n  \"especialidadId\": \"{{especialidadId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Eliminar medico creado por la coleccion (ADMIN) -> 204",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtAdmin}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/medicos/{{medicoIdNuevo}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('204 No Content', () => pm.response.to.have.status(204));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Citas",
+      "description": "Reservar/listar/reprogramar/marcar asistencia (citas-service)",
+      "item": [
+        {
+          "name": "Reservar cita (PACIENTE) -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtPaciente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/citas",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{pacienteId}}\",\n  \"medicoId\": \"{{medicoIdPropio}}\",\n  \"especialidadId\": \"{{especialidadId}}\",\n  \"fechaHora\": \"{{fechaCitaUnica}}\",\n  \"motivo\": \"Control coleccion 8.4\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Fecha unica de verdad: base 2031-01-01 + un offset en segundos derivado del epoch",
+                  "// actual (resolucion de 1s sobre un rango de ~300 dias). Dos corridas separadas por",
+                  "// >=1s no colisionan -> evita el 409 por el constraint unico (medicoId, fechaHora).",
+                  "const base = new Date(2031, 0, 1, 0, 0, 0).getTime();",
+                  "const offsetSec = Math.floor(Date.now() / 1000) % (300 * 24 * 3600);",
+                  "const dt = new Date(base + offsetSec * 1000);",
+                  "pm.collectionVariables.set('fechaCitaUnica', dt.toISOString().slice(0, 19));",
+                  "const dt2 = new Date(dt.getTime() + 7 * 24 * 60 * 60 * 1000);",
+                  "pm.collectionVariables.set('fechaReprogramadaUnica', dt2.toISOString().slice(0, 19));"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "pm.collectionVariables.set('citaId', body.id);",
+                  "pm.test('estado RESERVADA', () => pm.expect(body.estado).to.eql('RESERVADA'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener cita por id -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtPaciente}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/citas/{{citaId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar citas por paciente -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtPaciente}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/citas/paciente/{{pacienteId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar citas por medico -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtMedico}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/citas/medico/{{medicoIdPropio}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reprogramar cita (MEDICO/RECEPCIONISTA/ADMIN) -> 200",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtAdmin}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/citas/{{citaId}}/reprogramar",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaHora\": \"{{fechaReprogramadaUnica}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Marcar asistencia (MEDICO) -> 200 ATENDIDA",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtMedico}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/citas/{{citaId}}/asistencia",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"asistio\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('estado ATENDIDA', () => pm.expect(pm.response.json().estado).to.eql('ATENDIDA'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reservar cita sin rol valido (MEDICO) -> 403",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtMedico}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/citas",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": 1,\n  \"medicoId\": 1,\n  \"especialidadId\": 1,\n  \"fechaHora\": \"2030-09-01T10:00:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('403 Forbidden', () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. Historial",
+      "description": "Registrar y consultar atenciones (historial-medico-service)",
+      "item": [
+        {
+          "name": "Registrar atencion (MEDICO, cita debe estar ATENDIDA) -> 201",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtMedico}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/atenciones",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"citaId\": \"{{citaId}}\",\n  \"motivoConsulta\": \"Control coleccion 8.4\",\n  \"diagnostico\": \"Sano\",\n  \"tratamiento\": \"Ninguno\",\n  \"observaciones\": \"Generado por Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('atencionId', pm.response.json().id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar todas las atenciones (ADMIN/RECEPCIONISTA) -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtAdmin}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/atenciones"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Mis atenciones (PACIENTE, ver solo lo propio) -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtPaciente}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/atenciones/mis-atenciones"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener atencion por id (propietario) -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtPaciente}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/atenciones/{{atencionId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar atenciones por paciente (ADMIN) -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtAdmin}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/atenciones/paciente/{{pacienteId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar atenciones por medico (propio) -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtMedico}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/atenciones/medico/{{medicoIdPropio}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Actualizar atencion (MEDICO/ADMIN) -> 200",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtMedico}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/atenciones/{{atencionId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivoConsulta\": \"Control coleccion 8.4\",\n  \"diagnostico\": \"Sano\",\n  \"tratamiento\": \"Ninguno\",\n  \"observaciones\": \"Actualizado por la coleccion 8.4\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Registrar atencion sin ser MEDICO (PACIENTE) -> 403",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtPaciente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/atenciones",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"citaId\": 1,\n  \"motivoConsulta\": \"x\",\n  \"diagnostico\": \"x\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('403 Forbidden', () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "6. Reportes",
+      "description": "Resumenes agregados (reporte-service)",
+      "item": [
+        {
+          "name": "Resumen general (ADMIN/RECEPCIONISTA) -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtAdmin}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reportes/resumen"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Resumen por medico (ADMIN/RECEPCIONISTA/MEDICO) -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtMedico}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reportes/medico/{{medicoId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Resumen por especialidad -> 200",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtAdmin}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reportes/especialidad/{{especialidadId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Resumen general sin ser ADMIN/RECEPCIONISTA (PACIENTE) -> 403",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtPaciente}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/reportes/resumen"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('403 Forbidden', () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Resumen general sin token -> 401",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/reportes/resumen"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('401 Unauthorized', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://prenatal-tapered-divorcee.ngrok-free.dev"
+    },
+    {
+      "key": "jwtPaciente",
+      "value": ""
+    },
+    {
+      "key": "jwtMedico",
+      "value": ""
+    },
+    {
+      "key": "jwtAdmin",
+      "value": ""
+    },
+    {
+      "key": "usuarioIdPaciente",
+      "value": ""
+    },
+    {
+      "key": "usuarioIdMedico",
+      "value": ""
+    },
+    {
+      "key": "pacienteId",
+      "value": "1"
+    },
+    {
+      "key": "pacienteIdNuevo",
+      "value": ""
+    },
+    {
+      "key": "medicoId",
+      "value": "1"
+    },
+    {
+      "key": "medicoIdPropio",
+      "value": ""
+    },
+    {
+      "key": "medicoIdNuevo",
+      "value": ""
+    },
+    {
+      "key": "especialidadId",
+      "value": "1"
+    },
+    {
+      "key": "especialidadIdNueva",
+      "value": ""
+    },
+    {
+      "key": "citaId",
+      "value": ""
+    },
+    {
+      "key": "atencionId",
+      "value": ""
+    },
+    {
+      "key": "fechaCitaUnica",
+      "value": ""
+    },
+    {
+      "key": "fechaReprogramadaUnica",
+      "value": ""
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Evita la pagina de advertencia de ngrok en cada peticion",
+          "pm.request.headers.upsert({ key: \"ngrok-skip-browser-warning\", value: \"true\" });"
+        ]
+      }
+    }
+  ]
+}
