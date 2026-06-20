@@ -24,6 +24,8 @@ export class MedicosComponent implements OnInit {
   email = '';
   especialidadId: number | null = null;
 
+  editandoId: number | null = null;
+
   constructor(private doctorService: DoctorService) {}
 
   ngOnInit(): void {
@@ -48,6 +50,15 @@ export class MedicosComponent implements OnInit {
     });
   }
 
+  // El formulario sirve para crear o, si hay un médico en edición, para actualizar.
+  guardar(): void {
+    if (this.editandoId === null) {
+      this.crear();
+    } else {
+      this.actualizar();
+    }
+  }
+
   crear(): void {
     this.error = '';
     if (!this.nombres || !this.apellidos || !this.cmp || this.especialidadId === null) {
@@ -65,16 +76,64 @@ export class MedicosComponent implements OnInit {
       })
       .subscribe({
         next: () => {
-          this.nombres = '';
-          this.apellidos = '';
-          this.cmp = '';
-          this.telefono = '';
-          this.email = '';
-          this.especialidadId = null;
+          this.limpiarFormulario();
           this.cargar();
         },
         error: () => (this.error = 'No se pudo crear el médico (¿CMP repetido?).'),
       });
+  }
+
+  actualizar(): void {
+    this.error = '';
+    if (this.editandoId === null) {
+      return;
+    }
+    if (!this.nombres || !this.apellidos || this.especialidadId === null) {
+      this.error = 'Completa los campos obligatorios (nombres, apellidos, especialidad).';
+      return;
+    }
+    this.doctorService
+      .actualizarMedico(this.editandoId, {
+        nombres: this.nombres,
+        apellidos: this.apellidos,
+        telefono: this.telefono,
+        email: this.email,
+        especialidadId: this.especialidadId,
+      })
+      .subscribe({
+        next: () => {
+          this.cancelarEdicion();
+          this.cargar();
+        },
+        error: () => (this.error = 'No se pudo actualizar el médico.'),
+      });
+  }
+
+  // Carga los datos del médico en el formulario para editarlo (el CMP no es editable).
+  editar(medico: MedicoDTO): void {
+    this.editandoId = medico.id;
+    this.nombres = medico.nombres;
+    this.apellidos = medico.apellidos;
+    this.cmp = medico.cmp;
+    this.telefono = medico.telefono ?? '';
+    this.email = medico.email ?? '';
+    this.especialidadId = medico.especialidadId;
+    this.error = '';
+  }
+
+  cancelarEdicion(): void {
+    this.editandoId = null;
+    this.limpiarFormulario();
+    this.error = '';
+  }
+
+  private limpiarFormulario(): void {
+    this.nombres = '';
+    this.apellidos = '';
+    this.cmp = '';
+    this.telefono = '';
+    this.email = '';
+    this.especialidadId = null;
   }
 
   eliminar(medico: MedicoDTO): void {

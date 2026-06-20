@@ -34,3 +34,11 @@ export interface MedicoCrearRequest {
   email?: string;
   especialidadId: number;
 }
+
+export interface MedicoActualizarRequest {
+  nombres: string;
+  apellidos: string;
+  telefono?: string;
+  email?: string;
+  especialidadId: number;
+}

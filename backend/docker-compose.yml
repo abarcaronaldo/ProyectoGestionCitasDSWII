@@ -67,7 +67,7 @@ services:
       dockerfile: api-gateway/Dockerfile
     environment:
       EUREKA_URL: http://eureka-server:8761/eureka
-      JWT_SECRET: ${JWT_SECRET}
+      JWT_SECRET: ${JWT_SECRET:-4f8c2e9a7b1d63f05a9e8c47d2b1f6a3e90c75d84b2a1f63e8d70c95a4b3f12e6}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:4200}
     ports:
       - "8080:8080"
@@ -76,6 +76,17 @@ services:
     depends_on:
       eureka-server:
         condition: service_healthy
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    ports:
+      - "4200:80"
+    networks:
+      - gestioncitas-net
+    depends_on:
+      - api-gateway
 
   auth-service:
     build:
@@ -87,7 +98,7 @@ services:
       DB_USER: ${POSTGRES_USER:-postgres}
       DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       EUREKA_URL: http://eureka-server:8761/eureka
-      JWT_SECRET: ${JWT_SECRET}
+      JWT_SECRET: ${JWT_SECRET:-4f8c2e9a7b1d63f05a9e8c47d2b1f6a3e90c75d84b2a1f63e8d70c95a4b3f12e6}
     networks:
       - gestioncitas-net
     depends_on:

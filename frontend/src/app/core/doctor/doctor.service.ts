@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { EspecialidadCrearRequest, EspecialidadDTO, MedicoCrearRequest, MedicoDTO } from './doctor.models';
+import { EspecialidadCrearRequest, EspecialidadDTO, MedicoActualizarRequest, MedicoCrearRequest, MedicoDTO } from './doctor.models';
 
 @Injectable({ providedIn: 'root' })
 export class DoctorService {
@@ -30,6 +30,10 @@ export class DoctorService {
 
   crearMedico(datos: MedicoCrearRequest): Observable<MedicoDTO> {
     return this.http.post<MedicoDTO>(`${environment.apiUrl}/api/medicos`, datos);
+  }
+
+  actualizarMedico(id: number, datos: MedicoActualizarRequest): Observable<MedicoDTO> {
+    return this.http.put<MedicoDTO>(`${environment.apiUrl}/api/medicos/${id}`, datos);
   }
 
   eliminarMedico(id: number): Observable<void> {

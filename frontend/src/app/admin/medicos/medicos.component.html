@@ -6,8 +6,8 @@
 </p>
 
 <div class="card">
-  <h3>Crear médico</h3>
-  <form (ngSubmit)="crear()">
+  <h3>{{ editandoId ? 'Editar médico' : 'Crear médico' }}</h3>
+  <form (ngSubmit)="guardar()">
     <div>
       <label>Nombres</label>
       <input type="text" name="nombres" [(ngModel)]="nombres" required />
@@ -18,7 +18,10 @@
     </div>
     <div>
       <label>CMP</label>
-      <input type="text" name="cmp" [(ngModel)]="cmp" required />
+      <input type="text" name="cmp" [(ngModel)]="cmp" required [disabled]="editandoId !== null" />
+      @if (editandoId !== null) {
+        <small>El CMP no se puede modificar.</small>
+      }
     </div>
     <div>
       <label>Teléfono</label>
@@ -37,7 +40,10 @@
         }
       </select>
     </div>
-    <button type="submit">Crear</button>
+    <button type="submit">{{ editandoId ? 'Actualizar' : 'Crear' }}</button>
+    @if (editandoId !== null) {
+      <button type="button" (click)="cancelarEdicion()">Cancelar</button>
+    }
   </form>
 
   @if (error) {
@@ -70,7 +76,10 @@
               <td>{{ m.nombres }} {{ m.apellidos }}</td>
               <td>{{ m.cmp }}</td>
               <td>{{ m.especialidadNombre }}</td>
-              <td><button (click)="eliminar(m)">Eliminar</button></td>
+              <td>
+                <button (click)="editar(m)">Editar</button>
+                <button class="btn-rojo" (click)="eliminar(m)">Eliminar</button>
+              </td>
             </tr>
           }
         </tbody>
