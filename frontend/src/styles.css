@@ -196,9 +196,15 @@ tbody tr:hover td { background: var(--azul-claro); }
 .badge-inactivo { background: #F0F0F0; color: var(--texto-suave); }
 
 /* ---------- Mensajes ---------- */
-.error,
-form + p {
+.error {
   color: var(--rojo);
+  font-weight: 500;
+}
+
+/* Texto de ayuda bajo los formularios (ej. "¿No tienes cuenta? Regístrate").
+   La frase va en verde; el enlace conserva su azul por la regla global de <a>. */
+.texto-ayuda {
+  color: var(--verde-oscuro);
   font-weight: 500;
 }
 
