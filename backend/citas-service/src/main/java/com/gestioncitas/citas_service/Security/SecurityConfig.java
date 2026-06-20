@@ -27,7 +27,9 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/**").permitAll()
                         // reservar: la inicia el paciente (recepcion/admin pueden reservar en su nombre)
                         .requestMatchers(HttpMethod.POST, "/api/citas").hasAnyRole("PACIENTE", "RECEPCIONISTA", "ADMIN")
-                        // cancelar/reprogramar/marcar asistencia: las gestiona medico o recepcion/admin
+                        // cancelar: el paciente puede cancelar su cita (ademas de recepcion/admin)
+                        .requestMatchers(HttpMethod.PATCH, "/api/citas/*/cancelar").hasAnyRole("PACIENTE", "RECEPCIONISTA", "ADMIN")
+                        // reprogramar/marcar asistencia: las gestiona medico o recepcion/admin
                         .requestMatchers(HttpMethod.PATCH, "/api/citas/**").hasAnyRole("MEDICO", "RECEPCIONISTA", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/citas/**").authenticated()
                         .anyRequest().authenticated())
