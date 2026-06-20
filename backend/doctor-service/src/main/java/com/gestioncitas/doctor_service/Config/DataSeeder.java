@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * Carga especialidades y medicos de prueba si las tablas estan vacias.
- * usuarioId queda en null: aun no hay un mecanismo (Feign) que confirme
- * el id real del usuario en auth-service, asi que no se inventa un valor.
+ * Algunos medicos se enlazan a su cuenta demo del auth-service via usuarioId
+ * (ids fijos del seeder de auth) para que el medico vea su agenda al loguearse.
  */
 @Component
 @Profile("!test")
@@ -32,9 +32,12 @@ public class DataSeeder implements CommandLineRunner {
             Especialidad pediatria = crearEspecialidad("Pediatría", "Atención médica de niños y adolescentes");
             Especialidad dermatologia = crearEspecialidad("Dermatología", "Diagnóstico y tratamiento de enfermedades de la piel");
 
-            crearMedico("Jorge", "Ramírez Castro", "CMP12345", "987111333", "jorge.ramirez@gestion.pe", cardiologia);
-            crearMedico("Ana", "Torres Villanueva", "CMP23456", "987222444", "ana.torres@gestion.pe", pediatria);
-            crearMedico("Luis", "Fernández Quiroz", "CMP34567", "987333555", "luis.fernandez@gestion.pe", dermatologia);
+            // usuarioId enlaza el medico con su cuenta del auth-service (ids demo del seeder de auth:
+            // 3 = medico.Flores, 4 = medico.Mamani). Asi GET /api/medicos/usuario/{id} encuentra
+            // el medico al iniciar sesion. Fernandez queda sin cuenta (usuarioId null).
+            crearMedico(3L, "Jorge", "Ramírez Castro", "CMP12345", "987111333", "jorge.ramirez@gestion.pe", cardiologia);
+            crearMedico(4L, "Ana", "Torres Villanueva", "CMP23456", "987222444", "ana.torres@gestion.pe", pediatria);
+            crearMedico(null, "Luis", "Fernández Quiroz", "CMP34567", "987333555", "luis.fernandez@gestion.pe", dermatologia);
         }
     }
 
@@ -45,9 +48,10 @@ public class DataSeeder implements CommandLineRunner {
         return especialidadRepository.save(e);
     }
 
-    private void crearMedico(String nombres, String apellidos, String cmp, String telefono, String email,
+    private void crearMedico(Long usuarioId, String nombres, String apellidos, String cmp, String telefono, String email,
                               Especialidad especialidad) {
         Medico m = new Medico();
+        m.setUsuarioId(usuarioId);
         m.setNombres(nombres);
         m.setApellidos(apellidos);
         m.setCmp(cmp);
