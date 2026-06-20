@@ -1,27 +1,57 @@
-# Frontend
+# Frontend — Gestión de Citas Médicas
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.21.
+Aplicación web en **Angular 18** para el sistema de gestión de citas médicas. Es la interfaz que
+usan pacientes, médicos y personal administrativo; se comunica **únicamente con el API Gateway**
+(puerto 8080), que a su vez enruta a los microservicios.
 
-## Development server
+## Requisitos
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+- Node.js 18+ y npm
+- El **backend corriendo** (Gateway en `http://localhost:8080`) para que el login y los datos funcionen
 
-## Code scaffolding
+## Cómo levantarlo
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+```bash
+npm install      # solo la primera vez
+npm start        # equivale a "ng serve"
+```
 
-## Build
+Luego abrir **http://localhost:4200/**. El servidor recarga solo al guardar cambios.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+> En Windows con PowerShell, si `npm start` da un error de "scripts deshabilitados", usar
+> `npm.cmd start`.
 
-## Running unit tests
+## Configuración
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+La URL del backend se define en `src/environments/`:
 
-## Running end-to-end tests
+- `environment.development.ts` → desarrollo (`apiUrl: 'http://localhost:8080'`)
+- `environment.ts` → producción: cambiar `apiUrl` a la URL pública del Gateway antes de desplegar.
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+El token JWT se guarda en `localStorage` y un *interceptor* lo agrega a cada petición.
 
-## Further help
+## Usuarios de prueba
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Contraseña de todos: `Gestion2026`
+
+| Rol | Email |
+|---|---|
+| Administrador | `admin@gestion.pe` |
+| Médico | `medico.Flores@gestion.pe` |
+| Paciente | `paciente.Quispe@gestion.pe` |
+
+## Pantallas por rol
+
+- **Paciente:** reservar cita, mis citas (cancelar), mi historial.
+- **Médico:** mi agenda (marcar asistencia), registrar atención.
+- **Admin/Recepción:** médicos, especialidades, reportes.
+
+Las rutas están protegidas por *guards* según el rol.
+
+## Compilar para producción
+
+```bash
+npm run build    # genera la versión optimizada en dist/
+```
+
+El contenido de `dist/frontend/browser/` son archivos estáticos listos para servir.
