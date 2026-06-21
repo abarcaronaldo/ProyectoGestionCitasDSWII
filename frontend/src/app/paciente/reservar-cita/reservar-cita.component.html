@@ -10,7 +10,7 @@
       <form (ngSubmit)="enviar()">
         <div>
           <label>Especialidad</label>
-          <select name="especialidadId" [(ngModel)]="especialidadId" required>
+          <select name="especialidadId" [(ngModel)]="especialidadId" (ngModelChange)="onEspecialidadCambio()" required>
             <option [ngValue]="null" disabled>Selecciona una especialidad</option>
             @for (e of especialidades; track e.id) {
               <option [ngValue]="e.id">{{ e.nombre }}</option>
@@ -19,12 +19,17 @@
         </div>
         <div>
           <label>Médico</label>
-          <select name="medicoId" [(ngModel)]="medicoId" required>
-            <option [ngValue]="null" disabled>Selecciona un médico</option>
-            @for (m of medicos; track m.id) {
-              <option [ngValue]="m.id">{{ m.nombres }} {{ m.apellidos }} ({{ m.especialidadNombre }})</option>
+          <select name="medicoId" [(ngModel)]="medicoId" required [disabled]="especialidadId === null">
+            <option [ngValue]="null" disabled>
+              {{ especialidadId === null ? 'Primero selecciona una especialidad' : 'Selecciona un médico' }}
+            </option>
+            @for (m of medicosFiltrados; track m.id) {
+              <option [ngValue]="m.id">{{ m.nombres }} {{ m.apellidos }}</option>
             }
           </select>
+          @if (especialidadId !== null && medicosFiltrados.length === 0) {
+            <small>No hay médicos disponibles para esta especialidad.</small>
+          }
         </div>
         <div>
           <label>Fecha y hora</label>

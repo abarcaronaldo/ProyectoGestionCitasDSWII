@@ -29,6 +29,19 @@ export class ReservarCitaComponent implements OnInit {
 
   private pacienteId: number | null = null;
 
+  // Solo los médicos de la especialidad elegida (vacío mientras no se elija una).
+  get medicosFiltrados(): MedicoDTO[] {
+    if (this.especialidadId === null) {
+      return [];
+    }
+    return this.medicos.filter((m) => m.especialidadId === this.especialidadId);
+  }
+
+  // Al cambiar de especialidad se limpia el médico para no dejar uno de otra especialidad.
+  onEspecialidadCambio(): void {
+    this.medicoId = null;
+  }
+
   constructor(
     private auth: AuthService,
     private pacienteService: PacienteService,
