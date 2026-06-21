@@ -1,8 +1,6 @@
-<div class="card">
-  <h1>Gestión de Citas Médicas</h1>
-  <p>Frontend conectado al gateway en {{ apiUrl }}</p>
-
-  @if (auth.estaAutenticado()) {
+@if (auth.estaAutenticado()) {
+  <div class="card">
+    <h1>Gestión de Citas Médicas</h1>
     <p>Bienvenido, {{ auth.getNombres() }} ({{ auth.getRol() }})</p>
     <button (click)="cerrarSesion()">Cerrar sesión</button>
 
@@ -27,7 +25,21 @@
         <a routerLink="/admin/reportes">Reportes</a>
       </p>
     }
-  } @else {
-    <p><a routerLink="/login">Iniciar sesión</a> · <a routerLink="/registro">Registrarme</a></p>
-  }
-</div>
+  </div>
+} @else {
+  <div class="publica-split">
+    <div class="publica-imagen"></div>
+
+    <div class="publica-card-wrap">
+      <div class="card card-bienvenida">
+        <h1>⚕️ Gestión de Citas Médicas</h1>
+        <p class="texto-ayuda">Reserva tus citas, gestiona tu historial y conecta con tus médicos, todo en un solo lugar.</p>
+
+        <div class="bienvenida-acciones">
+          <a routerLink="/login" class="btn">Iniciar sesión</a>
+          <a routerLink="/registro" class="btn btn-secundario">Registrarme</a>
+        </div>
+      </div>
+    </div>
+  </div>
+}

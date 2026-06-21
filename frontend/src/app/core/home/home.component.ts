@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { environment } from '../../../environments/environment';
 import { AuthService } from '../auth/auth.service';
 
 @Component({
@@ -8,11 +7,9 @@ import { AuthService } from '../auth/auth.service';
   standalone: true,
   imports: [RouterLink],
   templateUrl: './home.component.html',
-  styles: ``
+  styleUrl: './home.component.css'
 })
 export class HomeComponent {
-  apiUrl = environment.apiUrl;
-
   constructor(public auth: AuthService) {}
 
   cerrarSesion(): void {

@@ -14,6 +14,14 @@ export class AppComponent {
 
   constructor(public auth: AuthService, private router: Router) {}
 
+  // Las páginas públicas de acceso (home sin sesión, login, registro) usan
+  // su propio layout de pantalla completa, así que ahí se oculta la barra
+  // de navegación global.
+  get ocultarBarra(): boolean {
+    const ruta = this.router.url.split('?')[0];
+    return ['/', '/login', '/registro'].includes(ruta) && !this.auth.estaAutenticado();
+  }
+
   cerrarSesion(): void {
     this.auth.logout();
     this.router.navigateByUrl('/');

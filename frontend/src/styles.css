@@ -264,6 +264,89 @@ tbody tr:hover td { background: var(--azul-claro); }
   font-weight: 500;
 }
 
+/* ---------- Páginas públicas de acceso (home sin sesión, login, registro):
+   imagen 50% + card 50%, sin barra de navegación ---------- */
+.publica-split {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Card de Login/Registro: más ancho y con más aire que el .card-estrecho
+   genérico (420px se veía angosto al lado de tanta imagen). */
+.card-publica {
+  width: 100%;
+  max-width: 480px;
+  padding: 2.5rem 3rem;
+}
+.card-publica input,
+.card-publica select {
+  max-width: 100%;
+}
+.card-publica h2 {
+  font-size: 1.6rem;
+}
+.card-publica .texto-ayuda {
+  margin-top: 1.25rem;
+  text-align: center;
+}
+.card-publica button[type='submit'] {
+  width: 100%;
+  margin-top: .5rem;
+  padding: .75rem 1.15rem;
+}
+
+/* Dos campos por fila (ej. Nombres/Apellidos, Contraseña/Teléfono) para
+   aprovechar el ancho del card en vez de apilar todo en una sola columna. */
+.fila-dos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 1rem;
+}
+
+@media (max-width: 480px) {
+  .card-publica {
+    padding: 1.75rem;
+  }
+  .fila-dos {
+    grid-template-columns: 1fr;
+  }
+}
+
+.publica-imagen {
+  flex: 1 1 50%;
+  background-image:
+    linear-gradient(180deg, rgba(9, 87, 134, .35), rgba(9, 87, 134, .6)),
+    url('/images/home_image.avif');
+  background-size: cover;
+  background-position: center;
+}
+
+.publica-card-wrap {
+  flex: 1 1 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: var(--fondo);
+}
+
+/* En pantallas chicas la imagen no cabe; el card pasa a ancho completo */
+@media (max-width: 768px) {
+  .publica-split {
+    flex-direction: column;
+  }
+  .publica-imagen {
+    display: none;
+  }
+  .publica-card-wrap {
+    min-height: 100vh;
+    padding: 1.5rem;
+  }
+  .card-bienvenida {
+    aspect-ratio: auto;
+  }
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 600px) {
   .contenedor { padding: 1rem .75rem; }

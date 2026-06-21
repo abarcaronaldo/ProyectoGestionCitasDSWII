@@ -1,35 +1,37 @@
-<header class="barra-superior">
-  <a routerLink="/" class="marca">⚕️ Gestión de Citas Médicas</a>
+@if (!ocultarBarra) {
+  <header class="barra-superior">
+    <a routerLink="/" class="marca">⚕️ Gestión de Citas Médicas</a>
 
-  <nav class="nav-links">
-    @if (auth.estaAutenticado()) {
-      <a routerLink="/" routerLinkActive="activo" [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
+    <nav class="nav-links">
+      @if (auth.estaAutenticado()) {
+        <a routerLink="/" routerLinkActive="activo" [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
 
-      @if (auth.getRol() === 'PACIENTE') {
-        <a routerLink="/paciente/mis-citas" routerLinkActive="activo">Mis citas</a>
-        <a routerLink="/paciente/reservar-cita" routerLinkActive="activo">Reservar cita</a>
-        <a routerLink="/paciente/mi-historial" routerLinkActive="activo">Mi historial</a>
+        @if (auth.getRol() === 'PACIENTE') {
+          <a routerLink="/paciente/mis-citas" routerLinkActive="activo">Mis citas</a>
+          <a routerLink="/paciente/reservar-cita" routerLinkActive="activo">Reservar cita</a>
+          <a routerLink="/paciente/mi-historial" routerLinkActive="activo">Mi historial</a>
+        }
+
+        @if (auth.getRol() === 'MEDICO') {
+          <a routerLink="/medico/mi-agenda" routerLinkActive="activo">Mi agenda</a>
+        }
+
+        @if (auth.getRol() === 'ADMIN' || auth.getRol() === 'RECEPCIONISTA') {
+          <a routerLink="/admin/medicos" routerLinkActive="activo">Médicos</a>
+          <a routerLink="/admin/especialidades" routerLinkActive="activo">Especialidades</a>
+          <a routerLink="/admin/reportes" routerLinkActive="activo">Reportes</a>
+        }
+
+        <span class="usuario">{{ auth.getNombres() }} ({{ auth.getRol() }})</span>
+        <button type="button" class="btn-salir" (click)="cerrarSesion()">Cerrar sesión</button>
+      } @else {
+        <a routerLink="/login" routerLinkActive="activo">Iniciar sesión</a>
+        <a routerLink="/registro" routerLinkActive="activo">Registrarme</a>
       }
+    </nav>
+  </header>
+}
 
-      @if (auth.getRol() === 'MEDICO') {
-        <a routerLink="/medico/mi-agenda" routerLinkActive="activo">Mi agenda</a>
-      }
-
-      @if (auth.getRol() === 'ADMIN' || auth.getRol() === 'RECEPCIONISTA') {
-        <a routerLink="/admin/medicos" routerLinkActive="activo">Médicos</a>
-        <a routerLink="/admin/especialidades" routerLinkActive="activo">Especialidades</a>
-        <a routerLink="/admin/reportes" routerLinkActive="activo">Reportes</a>
-      }
-
-      <span class="usuario">{{ auth.getNombres() }} ({{ auth.getRol() }})</span>
-      <button type="button" class="btn-salir" (click)="cerrarSesion()">Cerrar sesión</button>
-    } @else {
-      <a routerLink="/login" routerLinkActive="activo">Iniciar sesión</a>
-      <a routerLink="/registro" routerLinkActive="activo">Registrarme</a>
-    }
-  </nav>
-</header>
-
-<main class="contenedor">
+<main [class.contenedor]="!ocultarBarra">
   <router-outlet />
 </main>

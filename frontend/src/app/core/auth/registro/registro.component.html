@@ -1,37 +1,47 @@
-<div class="card card-estrecho">
-  <h2>Registro de paciente</h2>
+<div class="publica-split">
+  <div class="publica-imagen"></div>
 
-  @if (exito) {
-    <p>Cuenta creada. Redirigiendo al login...</p>
-  } @else {
-    <form (ngSubmit)="enviar()">
-      <div>
-        <label for="reg-nombres">Nombres</label>
-        <input id="reg-nombres" type="text" name="nombres" [(ngModel)]="nombres" required />
-      </div>
-      <div>
-        <label for="reg-apellidos">Apellidos</label>
-        <input id="reg-apellidos" type="text" name="apellidos" [(ngModel)]="apellidos" required />
-      </div>
-      <div>
-        <label for="reg-email">Email</label>
-        <input id="reg-email" type="email" name="email" [(ngModel)]="email" required />
-      </div>
-      <div>
-        <label for="reg-password">Contraseña</label>
-        <input id="reg-password" type="password" name="password" [(ngModel)]="password" required minlength="6" />
-      </div>
-      <div>
-        <label for="reg-telefono">Teléfono</label>
-        <input id="reg-telefono" type="text" name="telefono" [(ngModel)]="telefono" />
-      </div>
-      <button type="submit" [disabled]="enviando">{{ enviando ? 'Creando…' : 'Crear cuenta' }}</button>
-    </form>
+  <div class="publica-card-wrap">
+    <div class="card card-publica">
+      <h2>Registro de paciente</h2>
 
-    @if (error) {
-      <p class="error">{{ error }}</p>
-    }
-  }
+      @if (exito) {
+        <p>Cuenta creada. Redirigiendo al login...</p>
+      } @else {
+        <form (ngSubmit)="enviar()">
+          <div class="fila-dos">
+            <div>
+              <label for="reg-nombres">Nombres</label>
+              <input id="reg-nombres" type="text" name="nombres" [(ngModel)]="nombres" required />
+            </div>
+            <div>
+              <label for="reg-apellidos">Apellidos</label>
+              <input id="reg-apellidos" type="text" name="apellidos" [(ngModel)]="apellidos" required />
+            </div>
+          </div>
+          <div>
+            <label for="reg-email">Email</label>
+            <input id="reg-email" type="email" name="email" [(ngModel)]="email" required />
+          </div>
+          <div class="fila-dos">
+            <div>
+              <label for="reg-password">Contraseña</label>
+              <input id="reg-password" type="password" name="password" [(ngModel)]="password" required minlength="6" />
+            </div>
+            <div>
+              <label for="reg-telefono">Teléfono</label>
+              <input id="reg-telefono" type="text" name="telefono" [(ngModel)]="telefono" />
+            </div>
+          </div>
+          <button type="submit" [disabled]="enviando">{{ enviando ? 'Creando…' : 'Crear cuenta' }}</button>
+        </form>
 
-  <p class="texto-ayuda">¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión</a></p>
+        @if (error) {
+          <p class="error">{{ error }}</p>
+        }
+      }
+
+      <p class="texto-ayuda">¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión</a></p>
+    </div>
+  </div>
 </div>

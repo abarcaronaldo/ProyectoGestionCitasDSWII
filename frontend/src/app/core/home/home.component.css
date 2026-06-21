@@ -1,0 +1,23 @@
+/* ---------- Card cuadrado de bienvenida del Home público ----------
+   El layout split (imagen + wrap) está en styles.css, compartido con
+   login y registro; aquí solo lo específico del card del Home. */
+.card-bienvenida {
+  width: 100%;
+  max-width: 420px;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.bienvenida-acciones {
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  margin-top: 1.25rem;
+}
+
+.bienvenida-acciones .btn {
+  display: block;
+}
