@@ -18,11 +18,13 @@ export class RegistroComponent {
   telefono = '';
   error = '';
   exito = false;
+  enviando = false;
 
   constructor(private auth: AuthService, private router: Router) {}
 
   enviar(): void {
     this.error = '';
+    this.enviando = true;
     this.auth
       .registro({
         nombres: this.nombres,
@@ -37,7 +39,10 @@ export class RegistroComponent {
           this.exito = true;
           setTimeout(() => this.router.navigateByUrl('/login'), 1500);
         },
-        error: () => (this.error = 'No se pudo registrar. Revisa los datos.'),
+        error: () => {
+          this.error = 'No se pudo registrar. Revisa los datos.';
+          this.enviando = false;
+        },
       });
   }
 }

@@ -26,6 +26,7 @@ export class ReservarCitaComponent implements OnInit {
   cargando = true;
   error = '';
   exito = false;
+  enviando = false;
 
   private pacienteId: number | null = null;
 
@@ -89,6 +90,7 @@ export class ReservarCitaComponent implements OnInit {
 
     const fechaHora = this.fecha.length === 16 ? `${this.fecha}:00` : this.fecha;
 
+    this.enviando = true;
     this.citasService
       .reservar({
         pacienteId: this.pacienteId,
@@ -102,7 +104,10 @@ export class ReservarCitaComponent implements OnInit {
           this.exito = true;
           setTimeout(() => this.router.navigateByUrl('/paciente/mis-citas'), 1200);
         },
-        error: () => (this.error = 'No se pudo reservar la cita. Verifica los datos (médico/horario disponible).'),
+        error: () => {
+          this.error = 'No se pudo reservar la cita. Verifica los datos (médico/horario disponible).';
+          this.enviando = false;
+        },
       });
   }
 }

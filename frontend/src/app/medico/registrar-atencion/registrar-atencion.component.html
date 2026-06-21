@@ -21,7 +21,7 @@
         <label>Observaciones</label>
         <input type="text" name="observaciones" [(ngModel)]="observaciones" />
       </div>
-      <button type="submit" class="btn-verde">Guardar</button>
+      <button type="submit" class="btn-verde" [disabled]="enviando">{{ enviando ? 'Guardando…' : 'Guardar' }}</button>
     </form>
 
     @if (error) {

@@ -19,6 +19,7 @@ export class RegistrarAtencionComponent implements OnInit {
 
   error = '';
   exito = false;
+  enviando = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -32,6 +33,7 @@ export class RegistrarAtencionComponent implements OnInit {
 
   enviar(): void {
     this.error = '';
+    this.enviando = true;
     this.historialService
       .crear({
         citaId: this.citaId,
@@ -45,7 +47,10 @@ export class RegistrarAtencionComponent implements OnInit {
           this.exito = true;
           setTimeout(() => this.router.navigateByUrl('/medico/mi-agenda'), 1200);
         },
-        error: () => (this.error = 'No se pudo registrar la atención.'),
+        error: () => {
+          this.error = 'No se pudo registrar la atención.';
+          this.enviando = false;
+        },
       });
   }
 }

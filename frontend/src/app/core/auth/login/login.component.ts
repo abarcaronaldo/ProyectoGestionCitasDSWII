@@ -15,6 +15,7 @@ export class LoginComponent implements OnInit {
   password = '';
   error = '';
   sesionExpirada = false;
+  enviando = false;
 
   constructor(
     private auth: AuthService,
@@ -29,12 +30,16 @@ export class LoginComponent implements OnInit {
   enviar(): void {
     this.error = '';
     this.sesionExpirada = false;
+    this.enviando = true;
     this.auth.login({ email: this.email, password: this.password }).subscribe({
       next: () => {
         const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
         this.router.navigateByUrl(returnUrl ?? '/');
       },
-      error: () => (this.error = 'Email o contraseña incorrectos.'),
+      error: () => {
+        this.error = 'Email o contraseña incorrectos.';
+        this.enviando = false;
+      },
     });
   }
 }

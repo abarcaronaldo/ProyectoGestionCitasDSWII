@@ -44,7 +44,7 @@
         }
       </select>
     </div>
-    <button type="submit">{{ editandoId ? 'Actualizar' : 'Crear' }}</button>
+    <button type="submit" [disabled]="enviando">{{ enviando ? 'Guardando…' : (editandoId ? 'Actualizar' : 'Crear') }}</button>
     @if (editandoId !== null) {
       <button type="button" (click)="cancelarEdicion()">Cancelar</button>
     }

@@ -14,7 +14,7 @@
       <label>Contraseña</label>
       <input type="password" name="password" [(ngModel)]="password" required />
     </div>
-    <button type="submit">Entrar</button>
+    <button type="submit" [disabled]="enviando">{{ enviando ? 'Entrando…' : 'Entrar' }}</button>
   </form>
 
   @if (error) {

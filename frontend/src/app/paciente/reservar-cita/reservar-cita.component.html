@@ -39,7 +39,7 @@
           <label>Motivo</label>
           <input type="text" name="motivo" [(ngModel)]="motivo" />
         </div>
-        <button type="submit" class="btn-verde">Reservar</button>
+        <button type="submit" class="btn-verde" [disabled]="enviando">{{ enviando ? 'Reservando…' : 'Reservar' }}</button>
       </form>
     }
 

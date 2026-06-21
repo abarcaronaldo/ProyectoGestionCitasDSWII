@@ -17,6 +17,7 @@ export class MedicosComponent implements OnInit {
   cargando = true;
   error = '';
   exito = '';
+  enviando = false;
 
   nombres = '';
   apellidos = '';
@@ -66,6 +67,7 @@ export class MedicosComponent implements OnInit {
       this.error = 'Completa los campos obligatorios (nombres, apellidos, CMP, especialidad).';
       return;
     }
+    this.enviando = true;
     this.doctorService
       .crearMedico({
         nombres: this.nombres,
@@ -80,8 +82,12 @@ export class MedicosComponent implements OnInit {
           this.limpiarFormulario();
           this.cargar();
           this.mostrarExito('Médico creado correctamente.');
+          this.enviando = false;
         },
-        error: () => (this.error = 'No se pudo crear el médico (¿CMP repetido?).'),
+        error: () => {
+          this.error = 'No se pudo crear el médico (¿CMP repetido?).';
+          this.enviando = false;
+        },
       });
   }
 
@@ -94,6 +100,7 @@ export class MedicosComponent implements OnInit {
       this.error = 'Completa los campos obligatorios (nombres, apellidos, especialidad).';
       return;
     }
+    this.enviando = true;
     this.doctorService
       .actualizarMedico(this.editandoId, {
         nombres: this.nombres,
@@ -107,8 +114,12 @@ export class MedicosComponent implements OnInit {
           this.cancelarEdicion();
           this.cargar();
           this.mostrarExito('Médico actualizado correctamente.');
+          this.enviando = false;
         },
-        error: () => (this.error = 'No se pudo actualizar el médico.'),
+        error: () => {
+          this.error = 'No se pudo actualizar el médico.';
+          this.enviando = false;
+        },
       });
   }
 

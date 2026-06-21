@@ -16,6 +16,7 @@ export class EspecialidadesComponent implements OnInit {
   cargando = true;
   error = '';
   exito = '';
+  enviando = false;
 
   nombre = '';
   descripcion = '';
@@ -46,14 +47,19 @@ export class EspecialidadesComponent implements OnInit {
       this.error = 'El nombre es obligatorio.';
       return;
     }
+    this.enviando = true;
     this.doctorService.crearEspecialidad({ nombre: this.nombre, descripcion: this.descripcion }).subscribe({
       next: () => {
         this.nombre = '';
         this.descripcion = '';
         this.cargar();
         this.mostrarExito('Especialidad creada correctamente.');
+        this.enviando = false;
       },
-      error: () => (this.error = 'No se pudo crear la especialidad (¿nombre repetido?).'),
+      error: () => {
+        this.error = 'No se pudo crear la especialidad (¿nombre repetido?).';
+        this.enviando = false;
+      },
     });
   }
 
