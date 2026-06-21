@@ -48,6 +48,10 @@ export class ReportesComponent implements OnInit {
     });
   }
 
+  imprimir(): void {
+    window.print();
+  }
+
   consultarPorMedico(): void {
     if (this.medicoId === null) {
       return;

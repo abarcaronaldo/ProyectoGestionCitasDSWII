@@ -1,8 +1,12 @@
 <h2>Reportes</h2>
 
-<p>
+<p class="no-print">
   <a routerLink="/admin/medicos">Ir a médicos</a> |
   <a routerLink="/admin/especialidades">Ir a especialidades</a>
+</p>
+
+<p class="no-print">
+  <button type="button" class="btn-secundario" (click)="imprimir()">🖨️ Imprimir reportes</button>
 </p>
 
 @if (error) {

@@ -270,3 +270,20 @@ tbody tr:hover td { background: var(--azul-claro); }
   input, select { max-width: 100%; }
   button, .btn { width: 100%; }
 }
+
+/* ---------- Impresión (FE-14) ---------- */
+@media print {
+  /* Oculta la barra de navegación global y todo lo marcado como no imprimible */
+  .barra-superior,
+  .no-print {
+    display: none !important;
+  }
+  /* Tarjetas limpias en papel, sin sombras ni fondos pesados */
+  body { background: #fff; }
+  .card {
+    box-shadow: none;
+    border: 1px solid #ccc;
+    break-inside: avoid;
+  }
+  .contenedor { max-width: none; padding: 0; }
+}
