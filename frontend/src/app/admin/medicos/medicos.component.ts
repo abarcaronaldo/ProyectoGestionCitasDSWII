@@ -16,6 +16,7 @@ export class MedicosComponent implements OnInit {
   especialidades: EspecialidadDTO[] = [];
   cargando = true;
   error = '';
+  exito = '';
 
   nombres = '';
   apellidos = '';
@@ -78,6 +79,7 @@ export class MedicosComponent implements OnInit {
         next: () => {
           this.limpiarFormulario();
           this.cargar();
+          this.mostrarExito('Médico creado correctamente.');
         },
         error: () => (this.error = 'No se pudo crear el médico (¿CMP repetido?).'),
       });
@@ -104,6 +106,7 @@ export class MedicosComponent implements OnInit {
         next: () => {
           this.cancelarEdicion();
           this.cargar();
+          this.mostrarExito('Médico actualizado correctamente.');
         },
         error: () => (this.error = 'No se pudo actualizar el médico.'),
       });
@@ -141,8 +144,18 @@ export class MedicosComponent implements OnInit {
       return;
     }
     this.doctorService.eliminarMedico(medico.id).subscribe({
-      next: () => this.cargar(),
+      next: () => {
+        this.cargar();
+        this.mostrarExito('Médico eliminado.');
+      },
       error: () => (this.error = 'No se pudo eliminar el médico.'),
     });
+  }
+
+  // Muestra un mensaje de éxito que se oculta solo a los 3 segundos.
+  private mostrarExito(mensaje: string): void {
+    this.error = '';
+    this.exito = mensaje;
+    setTimeout(() => (this.exito = ''), 3000);
   }
 }

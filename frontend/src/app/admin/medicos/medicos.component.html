@@ -5,6 +5,10 @@
   <a routerLink="/admin/reportes">Ir a reportes</a>
 </p>
 
+@if (exito) {
+  <p class="exito">{{ exito }}</p>
+}
+
 <div class="card">
   <h3>{{ editandoId ? 'Editar médico' : 'Crear médico' }}</h3>
   <form (ngSubmit)="guardar()">

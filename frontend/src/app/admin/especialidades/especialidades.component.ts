@@ -15,6 +15,7 @@ export class EspecialidadesComponent implements OnInit {
   especialidades: EspecialidadDTO[] = [];
   cargando = true;
   error = '';
+  exito = '';
 
   nombre = '';
   descripcion = '';
@@ -50,6 +51,7 @@ export class EspecialidadesComponent implements OnInit {
         this.nombre = '';
         this.descripcion = '';
         this.cargar();
+        this.mostrarExito('Especialidad creada correctamente.');
       },
       error: () => (this.error = 'No se pudo crear la especialidad (¿nombre repetido?).'),
     });
@@ -60,8 +62,18 @@ export class EspecialidadesComponent implements OnInit {
       return;
     }
     this.doctorService.eliminarEspecialidad(especialidad.id).subscribe({
-      next: () => this.cargar(),
+      next: () => {
+        this.cargar();
+        this.mostrarExito('Especialidad eliminada.');
+      },
       error: () => (this.error = 'No se pudo eliminar la especialidad.'),
     });
+  }
+
+  // Muestra un mensaje de éxito que se oculta solo a los 3 segundos.
+  private mostrarExito(mensaje: string): void {
+    this.error = '';
+    this.exito = mensaje;
+    setTimeout(() => (this.exito = ''), 3000);
   }
 }

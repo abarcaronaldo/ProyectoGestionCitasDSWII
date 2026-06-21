@@ -219,6 +219,17 @@ tbody tr:hover td { background: var(--azul-claro); }
   font-weight: 500;
 }
 
+/* Caja de éxito (ej. "Médico creado correctamente"). */
+.exito {
+  background: var(--verde-claro);
+  color: var(--verde-oscuro);
+  border: 1px solid #B9E2D3;
+  border-radius: var(--radio-sm);
+  padding: .6rem .8rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 600px) {
   .contenedor { padding: 1rem .75rem; }

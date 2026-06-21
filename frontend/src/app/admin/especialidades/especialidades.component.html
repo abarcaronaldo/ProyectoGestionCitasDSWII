@@ -5,6 +5,10 @@
   <a routerLink="/admin/reportes">Ir a reportes</a>
 </p>
 
+@if (exito) {
+  <p class="exito">{{ exito }}</p>
+}
+
 <div class="card">
   <h3>Crear especialidad</h3>
   <form (ngSubmit)="crear()">
