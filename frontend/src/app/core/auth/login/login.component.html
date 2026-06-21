@@ -1,6 +1,10 @@
 <div class="card card-estrecho">
   <h2>Iniciar sesión</h2>
 
+  @if (sesionExpirada) {
+    <p class="aviso">Tu sesión expiró. Por seguridad, vuelve a iniciar sesión.</p>
+  }
+
   <form (ngSubmit)="enviar()">
     <div>
       <label>Email</label>

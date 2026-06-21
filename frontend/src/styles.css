@@ -208,6 +208,17 @@ tbody tr:hover td { background: var(--azul-claro); }
   font-weight: 500;
 }
 
+/* Caja de advertencia (ej. aviso de sesión expirada en el login). */
+.aviso {
+  background: #FCECEC;
+  color: var(--rojo);
+  border: 1px solid #F1B9B9;
+  border-radius: var(--radio-sm);
+  padding: .6rem .8rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 600px) {
   .contenedor { padding: 1rem .75rem; }
