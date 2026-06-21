@@ -22,7 +22,7 @@
             <tr>
               <td>{{ cita.id }}</td>
               <td>{{ cita.fechaHora | date:'dd/MM/yyyy HH:mm' }}</td>
-              <td>{{ cita.estado }}</td>
+              <td><span class="estado" [ngClass]="'estado-' + cita.estado.toLowerCase()">{{ cita.estado }}</span></td>
               <td>{{ cita.motivo }}</td>
               <td>
                 @if (cita.estado === 'RESERVADA') {

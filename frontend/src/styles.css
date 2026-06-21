@@ -195,6 +195,20 @@ tbody tr:hover td { background: var(--azul-claro); }
 .badge-activo { background: var(--verde-claro); color: var(--verde-oscuro); }
 .badge-inactivo { background: #F0F0F0; color: var(--texto-suave); }
 
+/* ---------- Badges de estado de cita ---------- */
+.estado {
+  display: inline-block;
+  padding: .2rem .6rem;
+  border-radius: 999px;
+  font-size: .78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.estado-reservada  { background: var(--azul-claro);  color: var(--azul-oscuro); }
+.estado-atendida   { background: var(--verde-claro); color: var(--verde-oscuro); }
+.estado-cancelada  { background: #FCECEC;            color: var(--rojo); }
+.estado-no_asistio { background: #FFF4E5;            color: #B26A00; }
+
 /* ---------- Mensajes ---------- */
 .error {
   color: var(--rojo);

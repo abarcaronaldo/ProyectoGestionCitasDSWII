@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgClass } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
@@ -9,7 +9,7 @@ import { PacienteService } from '../../core/paciente/paciente.service';
 @Component({
   selector: 'app-mis-citas',
   standalone: true,
-  imports: [RouterLink, DatePipe],
+  imports: [RouterLink, DatePipe, NgClass],
   templateUrl: './mis-citas.component.html',
   styles: ``
 })
