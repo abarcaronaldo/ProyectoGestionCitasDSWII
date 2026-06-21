@@ -2,7 +2,7 @@
 
 <div class="card">
   @if (cargando) {
-    <p>Cargando...</p>
+    <p class="cargando"><span class="spinner"></span> Cargando…</p>
   } @else {
     @if (citas.length === 0) {
       <p>No tienes citas asignadas.</p>

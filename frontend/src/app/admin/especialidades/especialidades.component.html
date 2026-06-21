@@ -31,7 +31,7 @@
 <div class="card">
   <h3>Listado</h3>
   @if (cargando) {
-    <p>Cargando...</p>
+    <p class="cargando"><span class="spinner"></span> Cargando…</p>
   } @else {
     @if (especialidades.length === 0) {
       <p>No hay especialidades registradas.</p>

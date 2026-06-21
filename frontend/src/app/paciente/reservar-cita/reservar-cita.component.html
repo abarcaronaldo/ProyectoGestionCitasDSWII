@@ -5,7 +5,7 @@
     <p>Cita reservada. Redirigiendo a "mis citas"...</p>
   } @else {
     @if (cargando) {
-      <p>Cargando...</p>
+      <p class="cargando"><span class="spinner"></span> Cargando…</p>
     } @else {
       <form (ngSubmit)="enviar()">
         <div>
