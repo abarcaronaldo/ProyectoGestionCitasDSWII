@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
@@ -9,7 +10,7 @@ import { HistorialService } from '../../core/historial/historial.service';
 @Component({
   selector: 'app-mi-agenda',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, DatePipe],
   templateUrl: './mi-agenda.component.html',
   styles: ``
 })

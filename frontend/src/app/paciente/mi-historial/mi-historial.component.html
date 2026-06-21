@@ -19,7 +19,7 @@
         <tbody>
           @for (a of atenciones; track a.id) {
             <tr>
-              <td>{{ a.fechaAtencion }}</td>
+              <td>{{ a.fechaAtencion | date:'dd/MM/yyyy HH:mm' }}</td>
               <td>{{ a.motivoConsulta }}</td>
               <td>{{ a.diagnostico }}</td>
               <td>{{ a.tratamiento }}</td>

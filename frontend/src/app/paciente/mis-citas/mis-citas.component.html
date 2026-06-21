@@ -23,7 +23,7 @@
           @for (cita of citas; track cita.id) {
             <tr>
               <td>{{ cita.id }}</td>
-              <td>{{ cita.fechaHora }}</td>
+              <td>{{ cita.fechaHora | date:'dd/MM/yyyy HH:mm' }}</td>
               <td>{{ cita.estado }}</td>
               <td>{{ cita.motivo }}</td>
               <td>
