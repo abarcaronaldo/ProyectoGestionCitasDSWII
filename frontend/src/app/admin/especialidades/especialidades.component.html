@@ -13,12 +13,12 @@
   <h3>Crear especialidad</h3>
   <form (ngSubmit)="crear()">
     <div>
-      <label>Nombre</label>
-      <input type="text" name="nombre" [(ngModel)]="nombre" required />
+      <label for="esp-nombre">Nombre</label>
+      <input id="esp-nombre" type="text" name="nombre" [(ngModel)]="nombre" required />
     </div>
     <div>
-      <label>Descripción</label>
-      <input type="text" name="descripcion" [(ngModel)]="descripcion" />
+      <label for="esp-descripcion">Descripción</label>
+      <input id="esp-descripcion" type="text" name="descripcion" [(ngModel)]="descripcion" />
     </div>
     <button type="submit" [disabled]="enviando">{{ enviando ? 'Creando…' : 'Crear' }}</button>
   </form>

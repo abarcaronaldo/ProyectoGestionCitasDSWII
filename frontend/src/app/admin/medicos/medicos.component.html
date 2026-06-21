@@ -13,31 +13,31 @@
   <h3>{{ editandoId ? 'Editar médico' : 'Crear médico' }}</h3>
   <form (ngSubmit)="guardar()">
     <div>
-      <label>Nombres</label>
-      <input type="text" name="nombres" [(ngModel)]="nombres" required />
+      <label for="med-nombres">Nombres</label>
+      <input id="med-nombres" type="text" name="nombres" [(ngModel)]="nombres" required />
     </div>
     <div>
-      <label>Apellidos</label>
-      <input type="text" name="apellidos" [(ngModel)]="apellidos" required />
+      <label for="med-apellidos">Apellidos</label>
+      <input id="med-apellidos" type="text" name="apellidos" [(ngModel)]="apellidos" required />
     </div>
     <div>
-      <label>CMP</label>
-      <input type="text" name="cmp" [(ngModel)]="cmp" required [disabled]="editandoId !== null" />
+      <label for="med-cmp">CMP</label>
+      <input id="med-cmp" type="text" name="cmp" [(ngModel)]="cmp" required [disabled]="editandoId !== null" />
       @if (editandoId !== null) {
         <small>El CMP no se puede modificar.</small>
       }
     </div>
     <div>
-      <label>Teléfono</label>
-      <input type="text" name="telefono" [(ngModel)]="telefono" />
+      <label for="med-telefono">Teléfono</label>
+      <input id="med-telefono" type="text" name="telefono" [(ngModel)]="telefono" />
     </div>
     <div>
-      <label>Email</label>
-      <input type="email" name="email" [(ngModel)]="email" />
+      <label for="med-email">Email</label>
+      <input id="med-email" type="email" name="email" [(ngModel)]="email" />
     </div>
     <div>
-      <label>Especialidad</label>
-      <select name="especialidadId" [(ngModel)]="especialidadId" required>
+      <label for="med-especialidad">Especialidad</label>
+      <select id="med-especialidad" name="especialidadId" [(ngModel)]="especialidadId" required>
         <option [ngValue]="null" disabled>Selecciona una especialidad</option>
         @for (e of especialidades; track e.id) {
           <option [ngValue]="e.id">{{ e.nombre }}</option>

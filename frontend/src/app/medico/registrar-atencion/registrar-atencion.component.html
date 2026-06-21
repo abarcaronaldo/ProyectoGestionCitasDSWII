@@ -6,20 +6,20 @@
   } @else {
     <form (ngSubmit)="enviar()">
       <div>
-        <label>Motivo de consulta</label>
-        <input type="text" name="motivoConsulta" [(ngModel)]="motivoConsulta" required />
+        <label for="at-motivo">Motivo de consulta</label>
+        <input id="at-motivo" type="text" name="motivoConsulta" [(ngModel)]="motivoConsulta" required />
       </div>
       <div>
-        <label>Diagnóstico</label>
-        <input type="text" name="diagnostico" [(ngModel)]="diagnostico" required />
+        <label for="at-diagnostico">Diagnóstico</label>
+        <input id="at-diagnostico" type="text" name="diagnostico" [(ngModel)]="diagnostico" required />
       </div>
       <div>
-        <label>Tratamiento</label>
-        <input type="text" name="tratamiento" [(ngModel)]="tratamiento" />
+        <label for="at-tratamiento">Tratamiento</label>
+        <input id="at-tratamiento" type="text" name="tratamiento" [(ngModel)]="tratamiento" />
       </div>
       <div>
-        <label>Observaciones</label>
-        <input type="text" name="observaciones" [(ngModel)]="observaciones" />
+        <label for="at-observaciones">Observaciones</label>
+        <input id="at-observaciones" type="text" name="observaciones" [(ngModel)]="observaciones" />
       </div>
       <button type="submit" class="btn-verde" [disabled]="enviando">{{ enviando ? 'Guardando…' : 'Guardar' }}</button>
     </form>

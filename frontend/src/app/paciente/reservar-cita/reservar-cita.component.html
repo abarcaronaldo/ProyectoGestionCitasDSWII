@@ -9,8 +9,8 @@
     } @else {
       <form (ngSubmit)="enviar()">
         <div>
-          <label>Especialidad</label>
-          <select name="especialidadId" [(ngModel)]="especialidadId" (ngModelChange)="onEspecialidadCambio()" required>
+          <label for="res-especialidad">Especialidad</label>
+          <select id="res-especialidad" name="especialidadId" [(ngModel)]="especialidadId" (ngModelChange)="onEspecialidadCambio()" required>
             <option [ngValue]="null" disabled>Selecciona una especialidad</option>
             @for (e of especialidades; track e.id) {
               <option [ngValue]="e.id">{{ e.nombre }}</option>
@@ -18,8 +18,8 @@
           </select>
         </div>
         <div>
-          <label>Médico</label>
-          <select name="medicoId" [(ngModel)]="medicoId" required [disabled]="especialidadId === null">
+          <label for="res-medico">Médico</label>
+          <select id="res-medico" name="medicoId" [(ngModel)]="medicoId" required [disabled]="especialidadId === null">
             <option [ngValue]="null" disabled>
               {{ especialidadId === null ? 'Primero selecciona una especialidad' : 'Selecciona un médico' }}
             </option>
@@ -32,12 +32,12 @@
           }
         </div>
         <div>
-          <label>Fecha y hora</label>
-          <input type="datetime-local" name="fecha" [(ngModel)]="fecha" required />
+          <label for="res-fecha">Fecha y hora</label>
+          <input id="res-fecha" type="datetime-local" name="fecha" [(ngModel)]="fecha" required />
         </div>
         <div>
-          <label>Motivo</label>
-          <input type="text" name="motivo" [(ngModel)]="motivo" />
+          <label for="res-motivo">Motivo</label>
+          <input id="res-motivo" type="text" name="motivo" [(ngModel)]="motivo" />
         </div>
         <button type="submit" class="btn-verde" [disabled]="enviando">{{ enviando ? 'Reservando…' : 'Reservar' }}</button>
       </form>
