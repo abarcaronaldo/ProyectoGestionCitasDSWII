@@ -56,6 +56,9 @@ export class EspecialidadesComponent implements OnInit {
   }
 
   eliminar(especialidad: EspecialidadDTO): void {
+    if (!confirm(`¿Eliminar la especialidad "${especialidad.nombre}"?`)) {
+      return;
+    }
     this.doctorService.eliminarEspecialidad(especialidad.id).subscribe({
       next: () => this.cargar(),
       error: () => (this.error = 'No se pudo eliminar la especialidad.'),

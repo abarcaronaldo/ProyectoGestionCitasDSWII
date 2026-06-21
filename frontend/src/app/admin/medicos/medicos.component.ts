@@ -137,6 +137,9 @@ export class MedicosComponent implements OnInit {
   }
 
   eliminar(medico: MedicoDTO): void {
+    if (!confirm(`¿Eliminar al médico ${medico.nombres} ${medico.apellidos}?`)) {
+      return;
+    }
     this.doctorService.eliminarMedico(medico.id).subscribe({
       next: () => this.cargar(),
       error: () => (this.error = 'No se pudo eliminar el médico.'),

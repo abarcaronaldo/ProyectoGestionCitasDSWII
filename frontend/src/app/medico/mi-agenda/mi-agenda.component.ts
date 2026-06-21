@@ -68,6 +68,9 @@ export class MiAgendaComponent implements OnInit {
   }
 
   marcarAsistencia(cita: CitaDTO, asistio: boolean): void {
+    if (!asistio && !confirm('¿Confirmas que el paciente NO asistió a la cita?')) {
+      return;
+    }
     this.citasService.marcarAsistencia(cita.id, asistio).subscribe({
       next: (actualizada) => (cita.estado = actualizada.estado),
       error: () => (this.error = 'No se pudo actualizar la asistencia.'),

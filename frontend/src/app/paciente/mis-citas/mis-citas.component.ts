@@ -52,6 +52,9 @@ export class MisCitasComponent implements OnInit {
   }
 
   cancelar(cita: CitaDTO): void {
+    if (!confirm('¿Seguro que deseas cancelar esta cita?')) {
+      return;
+    }
     this.citasService.cancelar(cita.id).subscribe({
       next: (actualizada) => {
         cita.estado = actualizada.estado;
