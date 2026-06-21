@@ -30,7 +30,10 @@ export class LoginComponent implements OnInit {
     this.error = '';
     this.sesionExpirada = false;
     this.auth.login({ email: this.email, password: this.password }).subscribe({
-      next: () => this.router.navigateByUrl('/'),
+      next: () => {
+        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+        this.router.navigateByUrl(returnUrl ?? '/');
+      },
       error: () => (this.error = 'Email o contraseña incorrectos.'),
     });
   }
