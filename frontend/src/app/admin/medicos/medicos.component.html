@@ -14,26 +14,26 @@
   <form (ngSubmit)="guardar()">
     <div>
       <label for="med-nombres">Nombres</label>
-      <input id="med-nombres" type="text" name="nombres" [(ngModel)]="nombres" required />
+      <input id="med-nombres" type="text" name="nombres" [(ngModel)]="nombres" required placeholder="Ej: Carlos" />
     </div>
     <div>
       <label for="med-apellidos">Apellidos</label>
-      <input id="med-apellidos" type="text" name="apellidos" [(ngModel)]="apellidos" required />
+      <input id="med-apellidos" type="text" name="apellidos" [(ngModel)]="apellidos" required placeholder="Ej: Ramírez" />
     </div>
     <div>
       <label for="med-cmp">CMP</label>
-      <input id="med-cmp" type="text" name="cmp" [(ngModel)]="cmp" required [disabled]="editandoId !== null" />
+      <input id="med-cmp" type="text" name="cmp" [(ngModel)]="cmp" required [disabled]="editandoId !== null" placeholder="Ej: CMP12345" />
       @if (editandoId !== null) {
         <small>El CMP no se puede modificar.</small>
       }
     </div>
     <div>
       <label for="med-telefono">Teléfono</label>
-      <input id="med-telefono" type="text" name="telefono" [(ngModel)]="telefono" />
+      <input id="med-telefono" type="text" name="telefono" [(ngModel)]="telefono" placeholder="Ej: 987654321 (opcional)" />
     </div>
     <div>
       <label for="med-email">Email</label>
-      <input id="med-email" type="email" name="email" [(ngModel)]="email" />
+      <input id="med-email" type="email" name="email" [(ngModel)]="email" placeholder="correo@ejemplo.com (opcional)" />
     </div>
     <div>
       <label for="med-especialidad">Especialidad</label>

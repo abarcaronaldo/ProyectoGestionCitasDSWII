@@ -14,11 +14,11 @@
   <form (ngSubmit)="crear()">
     <div>
       <label for="esp-nombre">Nombre</label>
-      <input id="esp-nombre" type="text" name="nombre" [(ngModel)]="nombre" required />
+      <input id="esp-nombre" type="text" name="nombre" [(ngModel)]="nombre" required placeholder="Ej: Cardiología" />
     </div>
     <div>
       <label for="esp-descripcion">Descripción</label>
-      <input id="esp-descripcion" type="text" name="descripcion" [(ngModel)]="descripcion" />
+      <input id="esp-descripcion" type="text" name="descripcion" [(ngModel)]="descripcion" placeholder="Breve descripción (opcional)" />
     </div>
     <button type="submit" [disabled]="enviando">{{ enviando ? 'Creando…' : 'Crear' }}</button>
   </form>

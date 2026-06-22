@@ -12,11 +12,11 @@
       <form (ngSubmit)="enviar()">
         <div>
           <label for="login-email">Email</label>
-          <input id="login-email" type="email" name="email" [(ngModel)]="email" required />
+          <input id="login-email" type="email" name="email" [(ngModel)]="email" required placeholder="tu@email.com" />
         </div>
         <div>
           <label for="login-password">Contraseña</label>
-          <input id="login-password" type="password" name="password" [(ngModel)]="password" required />
+          <input id="login-password" type="password" name="password" [(ngModel)]="password" required placeholder="Tu contraseña" />
         </div>
         <button type="submit" [disabled]="enviando">{{ enviando ? 'Entrando…' : 'Entrar' }}</button>
       </form>

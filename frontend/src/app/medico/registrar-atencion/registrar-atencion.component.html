@@ -7,19 +7,19 @@
     <form (ngSubmit)="enviar()">
       <div>
         <label for="at-motivo">Motivo de consulta</label>
-        <input id="at-motivo" type="text" name="motivoConsulta" [(ngModel)]="motivoConsulta" required />
+        <input id="at-motivo" type="text" name="motivoConsulta" [(ngModel)]="motivoConsulta" required placeholder="Ej: Dolor de cabeza persistente" />
       </div>
       <div>
         <label for="at-diagnostico">Diagnóstico</label>
-        <input id="at-diagnostico" type="text" name="diagnostico" [(ngModel)]="diagnostico" required />
+        <input id="at-diagnostico" type="text" name="diagnostico" [(ngModel)]="diagnostico" required placeholder="Ej: Migraña" />
       </div>
       <div>
         <label for="at-tratamiento">Tratamiento</label>
-        <input id="at-tratamiento" type="text" name="tratamiento" [(ngModel)]="tratamiento" />
+        <input id="at-tratamiento" type="text" name="tratamiento" [(ngModel)]="tratamiento" placeholder="Ej: Paracetamol 500mg cada 8 horas (opcional)" />
       </div>
       <div>
         <label for="at-observaciones">Observaciones</label>
-        <input id="at-observaciones" type="text" name="observaciones" [(ngModel)]="observaciones" />
+        <input id="at-observaciones" type="text" name="observaciones" [(ngModel)]="observaciones" placeholder="Notas adicionales (opcional)" />
       </div>
       <button type="submit" class="btn-verde" [disabled]="enviando">{{ enviando ? 'Guardando…' : 'Guardar' }}</button>
     </form>

@@ -12,25 +12,25 @@
           <div class="fila-dos">
             <div>
               <label for="reg-nombres">Nombres</label>
-              <input id="reg-nombres" type="text" name="nombres" [(ngModel)]="nombres" required />
+              <input id="reg-nombres" type="text" name="nombres" [(ngModel)]="nombres" required placeholder="Ej: Juan" />
             </div>
             <div>
               <label for="reg-apellidos">Apellidos</label>
-              <input id="reg-apellidos" type="text" name="apellidos" [(ngModel)]="apellidos" required />
+              <input id="reg-apellidos" type="text" name="apellidos" [(ngModel)]="apellidos" required placeholder="Ej: Pérez" />
             </div>
           </div>
           <div>
             <label for="reg-email">Email</label>
-            <input id="reg-email" type="email" name="email" [(ngModel)]="email" required />
+            <input id="reg-email" type="email" name="email" [(ngModel)]="email" required placeholder="tu@email.com" />
           </div>
           <div class="fila-dos">
             <div>
               <label for="reg-password">Contraseña</label>
-              <input id="reg-password" type="password" name="password" [(ngModel)]="password" required minlength="6" />
+              <input id="reg-password" type="password" name="password" [(ngModel)]="password" required minlength="6" placeholder="Mínimo 6 caracteres" />
             </div>
             <div>
               <label for="reg-telefono">Teléfono</label>
-              <input id="reg-telefono" type="text" name="telefono" [(ngModel)]="telefono" />
+              <input id="reg-telefono" type="text" name="telefono" [(ngModel)]="telefono" placeholder="Ej: 987654321" />
             </div>
           </div>
           <button type="submit" [disabled]="enviando">{{ enviando ? 'Creando…' : 'Crear cuenta' }}</button>

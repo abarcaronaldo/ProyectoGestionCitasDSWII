@@ -37,7 +37,7 @@
         </div>
         <div>
           <label for="res-motivo">Motivo</label>
-          <input id="res-motivo" type="text" name="motivo" [(ngModel)]="motivo" />
+          <input id="res-motivo" type="text" name="motivo" [(ngModel)]="motivo" placeholder="Ej: Dolor de muela (opcional)" />
         </div>
         <button type="submit" class="btn-verde" [disabled]="enviando">{{ enviando ? 'Reservando…' : 'Reservar' }}</button>
       </form>
