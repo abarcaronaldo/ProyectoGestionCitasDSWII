@@ -123,13 +123,47 @@ Cliente (Angular)
 
 ## 🚀 Cómo ejecutar el proyecto
 
-### ✅ Requisitos previos
+### 🐳 Opción recomendada: Docker (cero configuración)
+
+Es la forma **más simple**: levanta TODO el sistema (base de datos, mensajería, los 8 microservicios y el frontend) con un solo comando. No necesitas instalar Java, Maven, PostgreSQL ni RabbitMQ por separado.
+
+#### ✅ Único requisito
+- **[Docker Desktop](https://www.docker.com/products/docker-desktop/)** instalado y abierto.
+
+#### ▶️ Pasos
+
+```bash
+# 1) Clonar el repositorio
+git clone https://github.com/abarcaronaldo/ProyectoGestionCitasDSWII.git
+cd ProyectoGestionCitasDSWII/backend
+
+# 2) Levantar todo el sistema (la primera vez tarda unos minutos compilando)
+docker compose up --build
+```
+
+Cuando todos los servicios estén arriba, abre el navegador en:
+
+> 🌐 **Aplicación:** http://localhost:4200
+> 🧭 **Panel Eureka** (opcional): http://localhost:8761
+> 🐰 **Panel RabbitMQ** (opcional): http://localhost:15672 — usuario/clave: `guest` / `guest`
+
+Para apagar todo: `Ctrl + C` y luego `docker compose down`.
+
+> 💡 **No necesitas crear ningún archivo `.env`.** El `docker-compose.yml` ya trae valores por defecto que funcionan tal cual. Si quieres personalizar contraseñas o claves, copia `backend/.env.example` a `backend/.env` y ajusta lo que necesites (ese `.env` se ignora y no se sube al repo).
+
+---
+
+### 🧰 Opción alternativa: ejecución manual con Maven
+
+Solo si prefieres correr los servicios sin Docker (para depurar uno en concreto, por ejemplo).
+
+#### ✅ Requisitos previos
 - **Java 21**
 - **Maven 3.9+**
 - **PostgreSQL 17** (con las bases de datos creadas)
 - **RabbitMQ** (para `citas-service` y `reporte-service`)
 
-### ⚙️ Variables de entorno
+#### ⚙️ Variables de entorno
 
 ```bash
 JWT_SECRET=tu-clave-secreta-jwt
@@ -139,7 +173,7 @@ DB_USER=postgres
 DB_PASSWORD=tu-password
 ```
 
-### ▶️ Ejecución (local)
+#### ▶️ Ejecución
 
 ```bash
 # 1) Compilar todo el backend desde la carpeta backend/
